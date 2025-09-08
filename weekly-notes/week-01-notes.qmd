@@ -8,8 +8,12 @@ date: "2025-09-08"
 - [Technical skills covered]
 
 ## Coding Techniques
-- [New R functions or approaches]
-- [Quarto features learned]
+-  select() - choose columns
+•  filter() - choose rows
+•  mutate() - create new variables
+•  summarize() - calculate statistics
+•  group_by() - operate on groups
+
 
 ## Questions & Challenges
 - [What I didn't fully understand]

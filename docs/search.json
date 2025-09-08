@@ -137,7 +137,7 @@
     "href": "weekly-notes/week-01-notes.html#coding-techniques",
     "title": "Week 1 Notes - Course Introduction",
     "section": "Coding Techniques",
-    "text": "Coding Techniques\n\n[New R functions or approaches]\n[Quarto features learned]"
+    "text": "Coding Techniques\n\nselect() - choose columns • filter() - choose rows • mutate() - create new variables • summarize() - calculate statistics • group_by() - operate on groups"
   },
   {
     "objectID": "weekly-notes/week-01-notes.html#questions-challenges",
