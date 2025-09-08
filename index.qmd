@@ -4,7 +4,7 @@ title: "MUSA 5080 Portfolio"
 
 # Welcome to My Portfolio
 
-This portfolio documents my learning journey in Public Policy Analytics (MUSA 5080).
+Hello, my name is Joshua Rigsby and my background is in architecture, tand welcome to my portolio. This portfolio documents my learning journey in Public Policy Analytics (MUSA 5080). I am taking this course to learn how to interpret and infernece urban data. Email: joshuar5@upenn.edu, Github: jrigsbyr5
 
 ## About This Course
 Advanced spatial analysis and data science for urban planning and public policy.
