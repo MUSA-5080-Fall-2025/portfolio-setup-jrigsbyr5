@@ -5,11 +5,13 @@ project:
 website:
   title: "Joshua Rigsby - MUSA 5080 Portfolio"
   navbar:
-    left:
+     left:
       - href: index.qmd
         text: Home
-      - href: weekly-notes/
-        text: Weekly Notes
+      - text: Weekly Notes 
+        menu:
+          - href: weekly-notes/week-01-notes.qmd
+            text: Week 1
 
 format:
   html:
