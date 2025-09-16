@@ -1,0 +1,31 @@
+---
+title: "week-02-notes"
+editor: visual
+---
+## Key Concepts Learned
+- [Basic Commands in R, what they do, and some grammar on them]
+- [-Tidyverse which uses tibbles instead of tables and is cleaner  
+   -Group by and summarize go together very well,  group by one column and then summarize the data in another column after selecting the     groups using the first column.
+   -%>% to pipe code together
+]
+
+## Coding Techniques
+-  select() - choose columns
+•  filter() - choose rows
+•  mutate() - create new variables
+•  summarize() - calculate statistics
+•  group_by() - operate on groups
+
+
+## Questions & Challenges
+- [What I didn't fully understand]
+- [I need more practice with the  github interface.]
+
+## Connections to Policy
+- [We will use these technical concepts to manipulate data, and those inferences will be connected to policy content.]
+
+## Reflection
+- [Most interesting was learning how the github portfolio website operates, and how we can periodically change it.]
+- [I assume that as the semester progresses we will use this website to display our body of work]
+
+---
