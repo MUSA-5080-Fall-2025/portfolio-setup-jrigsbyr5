@@ -207,8 +207,8 @@ filter(Price >= 20000 & Price <= 35000)
 # Find diesel cars less than 10 years old
 #This would work if I didnt reload the data set
 
-disel_age = car_data %>%
-filter(age > 10 & "Fuel type" == "diesel")
+#disel_age = car_data %>%
+#filter(age > 10 & "Fuel type" == "diesel")
 
 ```
 
