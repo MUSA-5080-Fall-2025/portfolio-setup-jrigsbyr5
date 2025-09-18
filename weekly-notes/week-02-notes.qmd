@@ -3,29 +3,96 @@ title: "week-02-notes"
 editor: visual
 ---
 ## Key Concepts Learned
-- [Basic Commands in R, what they do, and some grammar on them]
-- [-Tidyverse which uses tibbles instead of tables and is cleaner  
-   -Group by and summarize go together very well,  group by one column and then summarize the data in another column after selecting the     groups using the first column.
-   -%>% to pipe code together
-]
+- [Basic data operations in R]
+- [Introduction to algorithms and biases]
+- [Introduction to census data and ACS]
+
+-[Proxy: What would you use to stand in for what you want?
+Blind spot: What data gap or historical bias could skew results?
+Harm + Guardrail: Who could be harmed, and one simple safeguard?]
+
+-[Most policy analysis happens at:
+County level - state and regional planning
+Census tract level - neighborhood analysis
+Block group level - very local analysis]
+
+-[ACS Data Structure
+Data organized in tables:
+B19013 - Median Household Income
+B25003 - Housing Tenure (Own/Rent)
+B15003 - Educational Attainment
+B08301 - Commuting to Work]
+
+-[GEOID - Geographic identifier
+NAME - Human-readable location name
+variable - Census variable code
+estimate - The actual value
+moe - Margin of error]
+
 
 ## Coding Techniques
--  select() - choose columns
-•  filter() - choose rows
-•  mutate() - create new variables
-•  summarize() - calculate statistics
-•  group_by() - operate on groups
+-Check the column names
+colnames(data name)
+
+-glimpse
+glimpse(data name)
+
+ncol – get column count
+nrow – get row count
+
+-Conversion to data frame
+df <- as.data.frame(data)
+
+-example of multiple selection:
+select(df, Manufacturer, Model, Price)
+
+-Select Manufacturer, Price, and Fuel type
+Have to quote Fuel type because there is a space
+
+select(car_data,Price, "Fuel type")
+
+Shortcut is to use minus sign to exclude
+select(car_data,-"Engine size
+
+-renaming 
+rename(data, new_name = old_name)
+
+-dplyr syntax for piping a command
+car_data = car_data %>%
+  rename(year = "Year of manufacture")
+  
+-Toyota goes in quotation marks but for a different reason than before
+car_data = car_data %>%
+filter(Manufacturer == "Toyota")
+
+-| used for or
+
+car_data = car_data %>%
+filter(Manufacturer == "Honda" | Manufacturer == "Nissan")
+
+
+Data Cleaning Essentials
+- str_remove(), str_extract(), str_replace()
+
+Calculating Data Reliability
+This is crucial for policy work:
+Key functions: case_when() for categories, MOE calculations
+
+Professional Tables
+Making results presentation-ready:
+Add descriptive column names and captions
+Format numbers appropriately
+
 
 
 ## Questions & Challenges
-- [What I didn't fully understand]
-- [I need more practice with the  github interface.]
+- [The step about filtering for disel and age was giving me trouble]
+- [I need to be more careful about the grammar/syntax.]
 
 ## Connections to Policy
-- [We will use these technical concepts to manipulate data, and those inferences will be connected to policy content.]
+- [The lecture had a clear and straightfoward direct connection to policy, but my main takeaway was that manipulating data to drive policy decisions is a far from perfect practice. Despite automation, bias still can creep in at any level and cause major disparity.]
 
 ## Reflection
-- [Most interesting was learning how the github portfolio website operates, and how we can periodically change it.]
-- [I assume that as the semester progresses we will use this website to display our body of work]
+- [I get a better idea of a clear system for performing data analysis for public policy, not necesarily all the technical skills involved yet but the type of data, platforms used, norms in the industry, and possible implications positive or negative.]
 
 ---

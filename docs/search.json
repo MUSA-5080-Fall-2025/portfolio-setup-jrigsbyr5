@@ -88,42 +88,42 @@
     "href": "weekly-notes/week-02-notes.html",
     "title": "week-02-notes",
     "section": "",
-    "text": "[Basic Commands in R, what they do, and some grammar on them]\n[-Tidyverse which uses tibbles instead of tables and is cleaner\n-Group by and summarize go together very well, group by one column and then summarize the data in another column after selecting the groups using the first column. -%&gt;% to pipe code together]"
+    "text": "[Basic data operations in R]\n[Introduction to algorithms and biases]\n[Introduction to census data and ACS]\n\n-[Proxy: What would you use to stand in for what you want? Blind spot: What data gap or historical bias could skew results? Harm + Guardrail: Who could be harmed, and one simple safeguard?]\n-[Most policy analysis happens at: County level - state and regional planning Census tract level - neighborhood analysis Block group level - very local analysis]\n-[ACS Data Structure Data organized in tables: B19013 - Median Household Income B25003 - Housing Tenure (Own/Rent) B15003 - Educational Attainment B08301 - Commuting to Work]\n-[GEOID - Geographic identifier NAME - Human-readable location name variable - Census variable code estimate - The actual value moe - Margin of error]"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#key-concepts-learned",
     "href": "weekly-notes/week-02-notes.html#key-concepts-learned",
     "title": "week-02-notes",
     "section": "",
-    "text": "[Basic Commands in R, what they do, and some grammar on them]\n[-Tidyverse which uses tibbles instead of tables and is cleaner\n-Group by and summarize go together very well, group by one column and then summarize the data in another column after selecting the groups using the first column. -%&gt;% to pipe code together]"
+    "text": "[Basic data operations in R]\n[Introduction to algorithms and biases]\n[Introduction to census data and ACS]\n\n-[Proxy: What would you use to stand in for what you want? Blind spot: What data gap or historical bias could skew results? Harm + Guardrail: Who could be harmed, and one simple safeguard?]\n-[Most policy analysis happens at: County level - state and regional planning Census tract level - neighborhood analysis Block group level - very local analysis]\n-[ACS Data Structure Data organized in tables: B19013 - Median Household Income B25003 - Housing Tenure (Own/Rent) B15003 - Educational Attainment B08301 - Commuting to Work]\n-[GEOID - Geographic identifier NAME - Human-readable location name variable - Census variable code estimate - The actual value moe - Margin of error]"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#coding-techniques",
     "href": "weekly-notes/week-02-notes.html#coding-techniques",
     "title": "week-02-notes",
     "section": "Coding Techniques",
-    "text": "Coding Techniques\n\nselect() - choose columns • filter() - choose rows • mutate() - create new variables • summarize() - calculate statistics • group_by() - operate on groups"
+    "text": "Coding Techniques\n-Check the column names colnames(data name)\n-glimpse glimpse(data name)\nncol – get column count nrow – get row count\n-Conversion to data frame df &lt;- as.data.frame(data)\n-example of multiple selection: select(df, Manufacturer, Model, Price)\n-Select Manufacturer, Price, and Fuel type Have to quote Fuel type because there is a space\nselect(car_data,Price, “Fuel type”)\nShortcut is to use minus sign to exclude select(car_data,-“Engine size\n-renaming rename(data, new_name = old_name)\n-dplyr syntax for piping a command car_data = car_data %&gt;% rename(year = “Year of manufacture”)\n-Toyota goes in quotation marks but for a different reason than before car_data = car_data %&gt;% filter(Manufacturer == “Toyota”)\n-| used for or\ncar_data = car_data %&gt;% filter(Manufacturer == “Honda” | Manufacturer == “Nissan”)\nData Cleaning Essentials - str_remove(), str_extract(), str_replace()\nCalculating Data Reliability This is crucial for policy work: Key functions: case_when() for categories, MOE calculations\nProfessional Tables Making results presentation-ready: Add descriptive column names and captions Format numbers appropriately"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#questions-challenges",
     "href": "weekly-notes/week-02-notes.html#questions-challenges",
     "title": "week-02-notes",
     "section": "Questions & Challenges",
-    "text": "Questions & Challenges\n\n[What I didn’t fully understand]\n[I need more practice with the github interface.]"
+    "text": "Questions & Challenges\n\n[The step about filtering for disel and age was giving me trouble]\n[I need to be more careful about the grammar/syntax.]"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#connections-to-policy",
     "href": "weekly-notes/week-02-notes.html#connections-to-policy",
     "title": "week-02-notes",
     "section": "Connections to Policy",
-    "text": "Connections to Policy\n\n[We will use these technical concepts to manipulate data, and those inferences will be connected to policy content.]"
+    "text": "Connections to Policy\n\n[The lecture had a clear and straightfoward direct connection to policy, but my main takeaway was that manipulating data to drive policy decisions is a far from perfect practice. Despite automation, bias still can creep in at any level and cause major disparity.]"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#reflection",
     "href": "weekly-notes/week-02-notes.html#reflection",
     "title": "week-02-notes",
     "section": "Reflection",
-    "text": "Reflection\n\n[Most interesting was learning how the github portfolio website operates, and how we can periodically change it.]\n[I assume that as the semester progresses we will use this website to display our body of work]"
+    "text": "Reflection\n\n[I get a better idea of a clear system for performing data analysis for public policy, not necesarily all the technical skills involved yet but the type of data, platforms used, norms in the industry, and possible implications positive or negative.]"
   },
   {
     "objectID": "labs/lab0/lab0_template.html",

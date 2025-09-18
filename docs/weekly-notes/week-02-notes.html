@@ -170,35 +170,51 @@ ul.task-list li input[type="checkbox"] {
 <section id="key-concepts-learned" class="level2">
 <h2 class="anchored" data-anchor-id="key-concepts-learned">Key Concepts Learned</h2>
 <ul>
-<li>[Basic Commands in R, what they do, and some grammar on them]</li>
-<li>[-Tidyverse which uses tibbles instead of tables and is cleaner<br>
--Group by and summarize go together very well, group by one column and then summarize the data in another column after selecting the groups using the first column. -%&gt;% to pipe code together]</li>
+<li>[Basic data operations in R]</li>
+<li>[Introduction to algorithms and biases]</li>
+<li>[Introduction to census data and ACS]</li>
 </ul>
+<p>-[Proxy: What would you use to stand in for what you want? Blind spot: What data gap or historical bias could skew results? Harm + Guardrail: Who could be harmed, and one simple safeguard?]</p>
+<p>-[Most policy analysis happens at: County level - state and regional planning Census tract level - neighborhood analysis Block group level - very local analysis]</p>
+<p>-[ACS Data Structure Data organized in tables: B19013 - Median Household Income B25003 - Housing Tenure (Own/Rent) B15003 - Educational Attainment B08301 - Commuting to Work]</p>
+<p>-[GEOID - Geographic identifier NAME - Human-readable location name variable - Census variable code estimate - The actual value moe - Margin of error]</p>
 </section>
 <section id="coding-techniques" class="level2">
 <h2 class="anchored" data-anchor-id="coding-techniques">Coding Techniques</h2>
-<ul>
-<li>select() - choose columns • filter() - choose rows • mutate() - create new variables • summarize() - calculate statistics • group_by() - operate on groups</li>
-</ul>
+<p>-Check the column names colnames(data name)</p>
+<p>-glimpse glimpse(data name)</p>
+<p>ncol – get column count nrow – get row count</p>
+<p>-Conversion to data frame df &lt;- as.data.frame(data)</p>
+<p>-example of multiple selection: select(df, Manufacturer, Model, Price)</p>
+<p>-Select Manufacturer, Price, and Fuel type Have to quote Fuel type because there is a space</p>
+<p>select(car_data,Price, “Fuel type”)</p>
+<p>Shortcut is to use minus sign to exclude select(car_data,-“Engine size</p>
+<p>-renaming rename(data, new_name = old_name)</p>
+<p>-dplyr syntax for piping a command car_data = car_data %&gt;% rename(year = “Year of manufacture”)</p>
+<p>-Toyota goes in quotation marks but for a different reason than before car_data = car_data %&gt;% filter(Manufacturer == “Toyota”)</p>
+<p>-| used for or</p>
+<p>car_data = car_data %&gt;% filter(Manufacturer == “Honda” | Manufacturer == “Nissan”)</p>
+<p>Data Cleaning Essentials - str_remove(), str_extract(), str_replace()</p>
+<p>Calculating Data Reliability This is crucial for policy work: Key functions: case_when() for categories, MOE calculations</p>
+<p>Professional Tables Making results presentation-ready: Add descriptive column names and captions Format numbers appropriately</p>
 </section>
 <section id="questions-challenges" class="level2">
 <h2 class="anchored" data-anchor-id="questions-challenges">Questions &amp; Challenges</h2>
 <ul>
-<li>[What I didn’t fully understand]</li>
-<li>[I need more practice with the github interface.]</li>
+<li>[The step about filtering for disel and age was giving me trouble]</li>
+<li>[I need to be more careful about the grammar/syntax.]</li>
 </ul>
 </section>
 <section id="connections-to-policy" class="level2">
 <h2 class="anchored" data-anchor-id="connections-to-policy">Connections to Policy</h2>
 <ul>
-<li>[We will use these technical concepts to manipulate data, and those inferences will be connected to policy content.]</li>
+<li>[The lecture had a clear and straightfoward direct connection to policy, but my main takeaway was that manipulating data to drive policy decisions is a far from perfect practice. Despite automation, bias still can creep in at any level and cause major disparity.]</li>
 </ul>
 </section>
 <section id="reflection" class="level2">
 <h2 class="anchored" data-anchor-id="reflection">Reflection</h2>
 <ul>
-<li>[Most interesting was learning how the github portfolio website operates, and how we can periodically change it.]</li>
-<li>[I assume that as the semester progresses we will use this website to display our body of work]</li>
+<li>[I get a better idea of a clear system for performing data analysis for public policy, not necesarily all the technical skills involved yet but the type of data, platforms used, norms in the industry, and possible implications positive or negative.]</li>
 </ul>
 <hr>
 
