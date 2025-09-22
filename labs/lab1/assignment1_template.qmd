@@ -1,8 +1,8 @@
 ---
 title: "Assignment 1: Census Data Quality for Policy Decisions"
 subtitle: "Evaluating Data Reliability for Algorithmic Decision-Making"
-author: "Your Name Here"
-date: today
+author: "Joshua Rigsby"
+date: 9-21-2025
 format: 
   html:
     code-fold: false
@@ -18,7 +18,7 @@ execute:
 
 ## Scenario
 
-You are a data analyst for the **[Your State] Department of Human Services**. The department is considering implementing an algorithmic system to identify communities that should receive priority for social service funding and outreach programs. Your supervisor has asked you to evaluate the quality and reliability of available census data to inform this decision.
+You are a data analyst for the **[California] Department of Human Services**. The department is considering implementing an algorithmic system to identify communities that should receive priority for social service funding and outreach programs. Your supervisor has asked you to evaluate the quality and reliability of available census data to inform this decision.
 
 Drawing on our Week 2 discussion of algorithmic bias, you need to assess not just what the data shows, but how reliable it is and what communities might be affected by data quality issues.
 
@@ -53,12 +53,19 @@ If there is a special character like comma, you need use double quote mark so th
 ```{r setup}
 # Load required packages (hint: you need tidycensus, tidyverse, and knitr)
 
+library(tidycensus)
+library(tidyverse)
+library(knitr)
+
 # Set your Census API key
 
 # Choose your state for analysis - assign it to a variable called my_state
+
+my_state = "California"
+
 ```
 
-**State Selection:** I have chosen **[Your State Name]** for this analysis because: [Brief explanation of why you chose this state]
+**State Selection:** I have chosen **[California]** for this analysis because: [California has vast geographical,economic and demographical variation by region and by municipality. It seems there is a huge potential for algorithmic bias to present itself in that region of the country, given the wide disparities that exist at almost every level.]
 
 # Part 2: County-Level Resource Assessment
 
@@ -78,10 +85,28 @@ If there is a special character like comma, you need use double quote mark so th
 ```{r county-data}
 # Write your get_acs() code here
 
+california_acs_data = get_acs(
+  geography = "county",
+  state = my_state,
+  variables = c(median_household_income = "B19013_001", total_population = "B01003_001"),
+  year = 2022,
+  survey = "acs5",
+  output = "wide"
+)
+
 # Clean the county names to remove state name and "County" 
+
+cleaned_california_acs_data = california_acs_data %>%
+  mutate(county = NAME %>%
+      str_remove(" County, California")
+  )
+
 # Hint: use mutate() with str_remove()
 
 # Display the first few rows
+
+glimpse(cleaned_california_acs_data)
+
 ```
 
 ## 2.2 Data Quality Assessment
