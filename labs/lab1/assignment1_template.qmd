@@ -125,9 +125,33 @@ glimpse(cleaned_california_acs_data)
 
 ```{r income-reliability}
 # Calculate MOE percentage and reliability categories using mutate()
+# Mutation for calculation margins of error
 
+california_data_moe= cleaned_california_acs_data %>%
+  mutate(median_income_moe = (median_household_incomeM / median_household_incomeE) * 100,
+         total_population_moe = (total_populationM / total_populationE) * 100
+  )
+
+# Mutation for creating reliability categories
+california_data_reliability = california_data_moe %>%
+  mutate(income_reliability = case_when(
+         median_income_moe < 5 ~ "High Confidence",
+         median_income_moe >= 5 & median_income_moe <= 10 ~ "Moderate Confidence",
+         median_income_moe > 10 ~ "Low Confidence"
+  ),
+    income_unreliable_flag = median_income_moe > 10  # Flag
+  )
+         
 # Create a summary showing count of counties in each reliability category
 # Hint: use count() and mutate() to add percentages
+
+california_data_reliability_summary = california_data_reliability %>%
+  count(income_reliability) %>%                    
+  mutate(percent = n /sum(n) * 100)
+
+print(california_data_reliability_summary)
+glimpse(california_data_reliability)
+
 ```
 
 ## 2.3 High Uncertainty Counties
@@ -145,12 +169,27 @@ glimpse(cleaned_california_acs_data)
 ```{r high-uncertainty}
 # Create table of top 5 counties by MOE percentage
 
+t5_counties_highest_moe = california_data_reliability %>%
+  arrange(desc(median_income_moe)) %>%   
+  slice(1:5) %>%                             
+  select(county,median_household_incomeE, median_household_incomeM, median_income_moe,income_reliability)
+
 # Format as table with kable() - include appropriate column names and caption
+
+kable(t5_counties_highest_moe,
+  col.names = c("County","Median Income", "Margin of Error", "MOE Percentage","Reliability category"),
+  caption = "Top 5 Counties with Higest Margin of Error Percentage"
+)
+
+print(t5_counties_highest_moe)
+
 ```
 
 **Data Quality Commentary:**
 
-[Write 2-3 sentences explaining what these results mean for algorithmic decision-making. Consider: Which counties might be poorly served by algorithms that rely on this income data? What factors might contribute to higher uncertainty?]
+[
+
+Write 2-3 sentences explaining what these results mean for algorithmic decision-making. Consider: Which counties might be poorly served by algorithms that rely on this income data? What factors might contribute to higher uncertainty?]
 
 # Part 3: Neighborhood-Level Analysis
 
@@ -162,13 +201,28 @@ glimpse(cleaned_california_acs_data)
 
 ```{r select-counties}
 # Use filter() to select 2-3 counties from your county_reliability data
+
+# I dont want to alter the california_data_reliability data set, so I will assign to a new variable straight away.
+
+selected_counties = california_data_reliability %>%
+  filter(county %in% c("Alpine", "Solano", "San Benito"))
+
 # Store the selected counties in a variable called selected_counties
+
+#I did this above.
 
 # Display the selected counties with their key characteristics
 # Show: county name, median income, MOE percentage, reliability category
+
+selected_counties_display = selected_counties %>%
+  select(county,median_household_incomeE, median_household_incomeM,median_income_moe,income_reliability)
+
+# View the result
+selected_counties_display
+
 ```
 
-**Comment on the output:** [write something :)]
+**Comment on the output:** [The three counties have a decent spread for margin of error, but more similar median incomes.]
 
 ## 3.2 Tract-Level Demographics
 
@@ -184,13 +238,52 @@ glimpse(cleaned_california_acs_data)
 ```{r tract-demographics}
 # Define your race/ethnicity variables with descriptive names
 
+race_variables = c(
+  White = "B03002_003",
+  Black_African_American = "B03002_004",
+  Hispanic_Latino = "B03002_012",
+  total = "B03002_001"
+)
+
 # Use get_acs() to retrieve tract-level data
 # Hint: You may need to specify county codes in the county parameter
 
+tract_race_data = get_acs(
+  geography = "tract",
+  variables = race_variables,
+  state = "CA",                          
+  county = c("003","069","095"),
+  year = 2022,                           
+  survey = "acs5",
+  output = "wide"                        
+)
+
 # Calculate percentage of each group using mutate()
+
+tract_race_data = tract_race_data %>%
+  mutate(
+    pct_white = (WhiteE / totalE) * 100,      
+    pct_black = (Black_African_AmericanE / totalE) * 100,      
+    pct_hispanic = (Hispanic_LatinoE / totalE) * 100    
+  )
+
 # Create percentages for white, Black, and Hispanic populations
 
+#done above
+
 # Add readable tract and county name columns using str_extract() or similar
+
+library(dplyr)
+library(stringr)
+
+tract_race_data = tract_race_data %>%
+  mutate(
+    Tract = str_extract(NAME, "Census Tract [0-9]+"),     
+    County = str_extract(NAME, "(?<=; ).*(?= County;)")   
+  )
+
+glimpse(tract_race_data)
+
 ```
 
 ## 3.3 Demographic Analysis
@@ -201,10 +294,32 @@ glimpse(cleaned_california_acs_data)
 # Find the tract with the highest percentage of Hispanic/Latino residents
 # Hint: use arrange() and slice() to get the top tract
 
+highest_pct_hisp = tract_race_data %>%
+  arrange(desc(pct_hispanic)) %>%   
+  slice(1) %>%                             
+  select(pct_hispanic, County, Tract,)
+
+glimpse(highest_pct_hisp)
+
 # Calculate average demographics by county using group_by() and summarize()
 # Show: number of tracts, average percentage for each racial/ethnic group
 
+tract_race_data_summary = tract_race_data %>%
+  group_by(County) %>%
+  summarize(
+    num_tracts = n(),                      
+    mean_pct_white = mean(pct_white, na.rm = TRUE),      
+    mean_pct_black = mean(pct_black, na.rm = TRUE),      
+    mean_pct_hispanic = mean(pct_hispanic, na.rm = TRUE) 
+  )
+
 # Create a nicely formatted table of your results using kable()
+
+kable(tract_race_data_summary,
+  col.names = c("County","Number of Tracts","Mean Percent White", "Mean Percent Black", "Mean Percent Hispanic"),
+  caption = "Summary of Average Demographics"
+)
+
 ```
 
 # Part 4: Comprehensive Data Quality Evaluation
@@ -222,10 +337,38 @@ glimpse(cleaned_california_acs_data)
 # Calculate MOE percentages for white, Black, and Hispanic variables
 # Hint: use the same formula as before (margin/estimate * 100)
 
+tract_race_data_moe = tract_race_data %>%
+  mutate(Black_African_American_moe = (Black_African_AmericanM / Black_African_AmericanE) * 100,
+         Hispanic_Latino_moe = (Hispanic_LatinoM / Hispanic_LatinoE) * 100,
+         White_moe = (WhiteM / WhiteE) * 100
+  )
+
 # Create a flag for tracts with high MOE on any demographic variable
 # Use logical operators (| for OR) in an ifelse() statement
 
+tract_race_data_moe$has_high_moe = ifelse(
+  tract_race_data_moe$Black_African_American_moe > 15 |
+  tract_race_data_moe$Hispanic_Latino_moe > 15 |
+  tract_race_data_moe$White_moe > 15,
+  TRUE,
+  FALSE
+)
+
 # Create summary statistics showing how many tracts have data quality issues
+
+tract_race_data_moe_summary = tract_race_data_moe %>%
+  group_by(County) %>%
+  filter(has_high_moe == TRUE) %>%       # so that the count reflects only tracts with data quality issues
+  summarize(
+    total_tracts = n(),                        
+    tracts_high_moe = sum(has_high_moe, na.rm = TRUE),
+  )
+
+kable(tract_race_data_moe_summary,
+  col.names = c("County","Total Tracts","Tracts with Quality Issues"),
+  caption = "Tracts with data quality issues"
+)
+
 ```
 
 ## 4.2 Pattern Analysis
@@ -234,11 +377,31 @@ glimpse(cleaned_california_acs_data)
 
 ```{r pattern-analysis}
 # Group tracts by whether they have high MOE issues
+
+tract_race_data_pattern = tract_race_data_moe %>%
+  group_by(has_high_moe)
+
 # Calculate average characteristics for each group:
 # - population size, demographic percentages
-
 # Use group_by() and summarize() to create this comparison
+
+#The demographic percentages were already calculated so I will summarize the mean for each.
+
+tract_race_data_pattern_summary = tract_race_data_pattern %>%
+  summarize(
+    Population_Size = sum(totalE, na.rm = TRUE),
+    mean_pct_white = mean(WhiteE, na.rm = TRUE),       
+    mean_pct_black = mean(Black_African_AmericanE, na.rm = TRUE),  
+    mean_pct_hispanic = mean(Hispanic_LatinoE, na.rm = TRUE)       
+  )
+
 # Create a professional table showing the patterns
+
+kable(tract_race_data_pattern_summary,
+  col.names = c("Has a High MOE ","Population Size", "Mean Percent White", "Mean Percent Black/African American", "Mean Percent Hispanic/Latino"),
+  caption = "Pattern Analysis: Average Characteristics"
+)
+
 ```
 
 **Pattern Analysis:** [Describe any patterns you observe. Do certain types of communities have less reliable data? What might explain this?]
@@ -268,12 +431,36 @@ glimpse(cleaned_california_acs_data)
 # Create a summary table using your county reliability data
 # Include: county name, median income, MOE percentage, reliability category
 
+california_data_reliability_summary_2 = california_data_reliability %>%
+  group_by(county) %>%
+  summarize(
+    median_income = mean(median_household_incomeE, na.rm = TRUE),       
+    moe_percentage = mean(median_income_moe, na.rm = TRUE),  
+    reliability = first(income_reliability)       
+  )%>%
+
 # Add a new column with algorithm recommendations using case_when():
 # - High Confidence: "Safe for algorithmic decisions"
 # - Moderate Confidence: "Use with caution - monitor outcomes"  
 # - Low Confidence: "Requires manual review or additional data"
 
+  mutate(
+    algorithmic_recommendation = case_when(
+      reliability == "High Confidence" ~ "Safe for algorithmic decisions",
+      reliability == "Moderate Confidence" ~ "Use with caution - monitor outcomes",
+      reliability == "Low Confidence" ~ "Requires manual review or additional data",
+      TRUE ~ "Unclassified"
+    )
+  )
+
 # Format as a professional table with kable()
+
+kable(
+  california_data_reliability_summary_2,
+  col.names = c("County", "Median Income", "MOE", "Reliability", "Algorithmic Recommendation"),
+  caption = "County Data Reliability Summary"
+)
+
 ```
 
 **Key Recommendations:**

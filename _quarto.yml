@@ -18,8 +18,9 @@ website:
         menu:
           - href: labs/lab0/lab0_template.qmd
             text: Lab 0
-          - href: labs/lab1/assignment1_template.qmd
+          - href: labs/lab1/week3_lab_excercise.qmd
             text: Lab 1
+          
 
 
 format:
