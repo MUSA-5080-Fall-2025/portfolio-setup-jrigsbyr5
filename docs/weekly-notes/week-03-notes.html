@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2025-09-22">
 
-<title>week-02-notes – Joshua Rigsby - MUSA 5080 Portfolio</title>
+<title>Week 3 Notes – Joshua Rigsby - MUSA 5080 Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -169,7 +170,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">week-02-notes</h1>
+<h1 class="title">Week 3 Notes</h1>
 </div>
 
 
@@ -177,6 +178,12 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 22, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -189,53 +196,121 @@ ul.task-list li input[type="checkbox"] {
 <section id="key-concepts-learned" class="level2">
 <h2 class="anchored" data-anchor-id="key-concepts-learned">Key Concepts Learned</h2>
 <ul>
-<li>[Basic data operations in R]</li>
-<li>[Introduction to algorithms and biases]</li>
-<li>[Introduction to census data and ACS]</li>
+<li>[ggplot2 Commands in R, what they do, and some grammar on them]</li>
+<li>[EDA Workflow]</li>
+<li>[More on data reliability]</li>
 </ul>
-<p>-[Proxy: What would you use to stand in for what you want? Blind spot: What data gap or historical bias could skew results? Harm + Guardrail: Who could be harmed, and one simple safeguard?]</p>
-<p>-[Most policy analysis happens at: County level - state and regional planning Census tract level - neighborhood analysis Block group level - very local analysis]</p>
-<p>-[ACS Data Structure Data organized in tables: B19013 - Median Household Income B25003 - Housing Tenure (Own/Rent) B15003 - Educational Attainment B08301 - Commuting to Work]</p>
-<p>-[GEOID - Geographic identifier NAME - Human-readable location name variable - Census variable code estimate - The actual value moe - Margin of error]</p>
 </section>
 <section id="coding-techniques" class="level2">
 <h2 class="anchored" data-anchor-id="coding-techniques">Coding Techniques</h2>
-<p>-Check the column names colnames(data name)</p>
-<p>-glimpse glimpse(data name)</p>
-<p>ncol – get column count nrow – get row count</p>
-<p>-Conversion to data frame df &lt;- as.data.frame(data)</p>
-<p>-example of multiple selection: select(df, Manufacturer, Model, Price)</p>
-<p>-Select Manufacturer, Price, and Fuel type Have to quote Fuel type because there is a space</p>
-<p>select(car_data,Price, “Fuel type”)</p>
-<p>Shortcut is to use minus sign to exclude select(car_data,-“Engine size</p>
-<p>-renaming rename(data, new_name = old_name)</p>
-<p>-dplyr syntax for piping a command car_data = car_data %&gt;% rename(year = “Year of manufacture”)</p>
-<p>-Toyota goes in quotation marks but for a different reason than before car_data = car_data %&gt;% filter(Manufacturer == “Toyota”)</p>
-<p>-| used for or</p>
-<p>car_data = car_data %&gt;% filter(Manufacturer == “Honda” | Manufacturer == “Nissan”)</p>
-<p>Data Cleaning Essentials - str_remove(), str_extract(), str_replace()</p>
-<p>Calculating Data Reliability This is crucial for policy work: Key functions: case_when() for categories, MOE calculations</p>
-<p>Professional Tables Making results presentation-ready: Add descriptive column names and captions Format numbers appropriately</p>
+<ul>
+<li><p><strong>ggplot2 – grammar of graphics</strong></p>
+<p>Data → Aesthetics → Geometries → Visual</p>
+<p>Data: Your dataset (census data, survey responses, etc.)</p>
+<p>Aesthetics: What variables map to visual properties (x, y, color, size)</p>
+<p>Geometries: How to display the data (points, bars, lines)</p>
+<p>Additional layers: Scales, themes, facets, annotations</p>
+<p>g  ggplot (data=acs_data) +</p>
+<p>-I would like to make a plot&nbsp;</p>
+<p>- This is a proclamation that gives you a blank plot</p>
+<p>aes or aesthetics is how you draw a connection between data in the table and elements of the plot</p>
+<p>aes ( x = income, y =%bash) +</p>
+<p>geom_points(decorate,colors,sizes)</p>
+<p><strong>Every ggplot has this pattern:</strong></p>
+<p>ggplot(data = your_data) +&nbsp;&nbsp; aes(x = variable1, y = variable2) +&nbsp;&nbsp; geom_something() +&nbsp;&nbsp; additional_layers()</p>
+<p>You build plots by adding layers with +</p>
+<p>Quiz question – aesthetics are not for decorating or creating visual elements, you can map color variation by field but not other aesthetic qualities</p>
+<p><strong>Aesthetics map data to visual properties:</strong></p>
+<p>x, y - position</p>
+<p>color - point/line color</p>
+<p>fill - area fill color</p>
+<p>size - point/line size</p>
+<p>shape - point shape</p>
+<p>alpha - transparency</p>
+<p>Important: Aesthetics go inside aes(), constants go outside</p></li>
+<li><p>Code for filtering for outliers on boxplot</p>
+<p># Identify the outlier counties - REVIEW</p>
+<p>income_outliers &lt;- county_data %&gt;%</p>
+<p>&nbsp; mutate(</p>
+<p>&nbsp;&nbsp;&nbsp; Q1 = quantile(median_incomeE, 0.25, na.rm = TRUE),</p>
+<p>&nbsp;&nbsp;&nbsp; Q3 = quantile(median_incomeE, 0.75, na.rm = TRUE),</p>
+<p>&nbsp;&nbsp;&nbsp; IQR = Q3 - Q1,</p>
+<p>&nbsp;&nbsp;&nbsp; outlier = median_incomeE &lt; (Q1 - 1.5 * IQR) | median_incomeE &gt; (Q3 + 1.5 * IQR)</p>
+<p>&nbsp; ) %&gt;%</p>
+<p>&nbsp; filter(outlier) %&gt;%</p>
+<p>&nbsp; select(county_name, median_incomeE)</p>
+<p>print(“Outlier counties:”)</p>
+<p>income_outlier</p>
+<p>Explanation,</p>
+<p>1. mutate(…)</p>
+<p>Inside mutate, you’re calculating statistics that will be the same for every row in the dataset:</p>
+<p>Q1 → the first quartile (25th percentile) of median_incomeE.</p>
+<p>Q3 → the third quartile (75th percentile) of median_incomeE.</p>
+<p>IQR → the interquartile range, i.e.&nbsp;Q3 - Q1.</p>
+<p>This measures the spread of the middle 50% of the data.</p>
+<p>outlier → a logical (TRUE/FALSE) column.</p>
+<p>A county is flagged as an outlier if its median income is:</p>
+<p>Less than Q1 - 1.5 * IQR (much lower than typical), OR</p>
+<p>Greater than Q3 + 1.5 * IQR (much higher than typical).</p>
+<p>This is the standard Tukey rule for outlier detection.</p>
+<p>2. filter(outlier)</p>
+<p>Keeps only the rows (counties) where outlier == TRUE.</p>
+<p>3. select(county_name, median_incomeE)</p>
+<p>Keeps only the county name and its median income for the outlier counties.</p>
+<p>4. print(“Outlier counties:”) and income_outliers</p>
+<p>Prints the label, then shows the filtered table of counties that were identified as outliers.</p>
+<p>Example of calculating correlation on a scatter plot</p>
+<p>edu_income_cor &lt;- cor(combined_data$pct_college, combined_data$median_incomeE, use = “complete.obs”)</p>
+<p>print(paste(“Education-Income Correlation:”, round(edu_income_cor, 3))</p></li>
+<li><p>**Key Tips for Variable Hunting:**</p>
+<p>1.**Start with concepts** - search for the topic you want (income,</p>
+<p>age, housing)</p>
+<ol start="2" type="1">
+<li>**Look for “Median”** vs “Mean” - median is usually more</li>
+</ol>
+<p>policy-relevant</p>
+<p>3.**Check the universe** - some variables are for “households,” others</p>
+<p>for “population”</p>
+<p>4.&nbsp; **Test with small data** before running large queries</p>
+<p>5.&nbsp; **Bookmark useful variables** for future projects</p></li>
+</ul>
 </section>
 <section id="questions-challenges" class="level2">
 <h2 class="anchored" data-anchor-id="questions-challenges">Questions &amp; Challenges</h2>
 <ul>
-<li>[The step about filtering for disel and age was giving me trouble]</li>
-<li>[I need to be more careful about the grammar/syntax.]</li>
+<li>[What I didn’t fully understand]</li>
+<li>[I need more practice with the github interface.]</li>
 </ul>
 </section>
 <section id="connections-to-policy" class="level2">
 <h2 class="anchored" data-anchor-id="connections-to-policy">Connections to Policy</h2>
 <ul>
-<li>[The lecture had a clear and straightfoward direct connection to policy, but my main takeaway was that manipulating data to drive policy decisions is a far from perfect practice. Despite automation, bias still can creep in at any level and cause major disparity.]</li>
+<li><p>[Bad Visualizations Have Real Consequences</p>
+<p>Common problems in government data presentation:</p>
+<p>Misleading scales or axes</p>
+<p>Cherry-picked time periods</p>
+<p>Hidden or ignored uncertainty</p>
+<p>Missing context about data reliability</p>
+<p>-There can be a lot of uncertainty surrounding block level data</p>
+<p>-Census tracts are bigger but have smaller margins of error</p></li>
+<li><p>Exploratory data analysis should take a lot of time – get to know your data.</p>
+<p><strong>EDA Workflow with Data Quality Focus</strong></p>
+<p>Enhanced process for policy analysis:</p>
+<p>Load and inspect - dimensions, variable types, missing data</p>
+<p>Assess reliability - examine margins of error, calculate coefficients of variation</p>
+<p>Visualize distributions - histograms, boxplots for each variable</p>
+<p>Explore relationships - scatter plots, correlations</p>
+<p>Identify patterns - grouping, clustering, geographical patterns</p>
+<p>Question anomalies - investigate outliers and unusual patterns</p>
+<p>Document limitations - prepare honest communication about data quality</p></li>
+<li><p>.]</p></li>
 </ul>
 </section>
 <section id="reflection" class="level2">
 <h2 class="anchored" data-anchor-id="reflection">Reflection</h2>
 <ul>
-<li>[I get a better idea of a clear system for performing data analysis for public policy, not necesarily all the technical skills involved yet but the type of data, platforms used, norms in the industry, and possible implications positive or negative.]</li>
+<li>[I enjoyed learning how to plot so many different types of analysis in R using ggplot, and discovering a more streamlined method for getting and analyzing census data.]</li>
 </ul>
-<hr>
 
 
 </section>
