@@ -187,9 +187,7 @@ print(t5_counties_highest_moe)
 
 **Data Quality Commentary:**
 
-[
-
-Write 2-3 sentences explaining what these results mean for algorithmic decision-making. Consider: Which counties might be poorly served by algorithms that rely on this income data? What factors might contribute to higher uncertainty?]
+[These seem to be very high margins of error, even for the highest five in the data set.This could mean that algorithmic decision making will be skewed for these counties, a key factor that is evident is that the highest margins of error are associated with the highest median household incomes. The counties with higher median household incomes would likely be more affected.]
 
 # Part 3: Neighborhood-Level Analysis
 
@@ -404,7 +402,7 @@ kable(tract_race_data_pattern_summary,
 
 ```
 
-**Pattern Analysis:** [Describe any patterns you observe. Do certain types of communities have less reliable data? What might explain this?]
+**Pattern Analysis:** [Where there exists a high margin of error there is a lower percentage of african american people. In addition where there exists a high margin of error there is a larger percentage of white people, than there are where there doesn't exists a high margin of error. It seems that the Black/Affrican American data is less reliable.]
 
 
 # Part 5: Policy Recommendations
@@ -421,7 +419,15 @@ kable(tract_race_data_pattern_summary,
 
 **Executive Summary:**
 
-[Your integrated 4-paragraph summary here]
+[Your integrated 4-paragraph summary here
+
+A general theme among all the analysis was that all of the data included relatively alarming amounts of margin of error. The highest margins of error where correlated with higher median income counties, and with counties that had a high percentage of white people. In the race data summary, there was not a single tract that did not have quality issues, so at this level there seems to be problematic data among all the communities and demographics from the analyses.
+
+It seems that the communities that face the greates risk for algorithmic bias based on the findings are white people where they exist at a higher population percentage, african americans where they exist in a lower population percentage, and higher median household income caounties.
+
+It would seem that given the most affected communities and demographics, that factors most influencing  data quality issues and bias are income level, and race, which both have subsets of explanatory factors. When dealing with income data, income is not necearsily reflective of an individuals economic stability, it is just the capital recived before money goes out so there is alot of variability there. With race it is well known that generational, historical, and societal factors lead to the dispersion of racial groups to different places.
+
+For the department to address these systematic issues, it would be benefical to group median household income with an additional differentiation factor such as: amount of debt, properties at risk of forclosure, and number of people in the household to see if overlap in these areas could explain high margins of error.]
 
 ## 6.3 Specific Recommendations
 
@@ -467,32 +473,35 @@ kable(
 
 **Your Task:** Use your analysis results to provide specific guidance to the department.
 
-1. **Counties suitable for immediate algorithmic implementation:** [List counties with high confidence data and explain why they're appropriate]
+1. **Counties suitable for immediate algorithmic implementation:** [Alameda, Butte, Calaveras, Contra costa, El Dorado, Fresno, Humboldt, Imperial, Kern, Kings, Lake, Los Angeles, Madera, Marin, Mendecino, Merced, Monterey, Napa, Nevada, Orange, Placer, Riverside, Sacramento, San Bernardino, San Diego, San Francisco, San Joaquin, San Luis Obispo, San Mateo, Santa Barbara, Santa Clara, Santa Cruz, Shasta, Siskiyou, Solano, Sonoma, Stanislaus, Sutter, Tulare, Ventura, Yolo, Yuba. For these counties algorthmic decisions are safe to be made as there is a high confidence in the data.]
 
-2. **Counties requiring additional oversight:** [List counties with moderate confidence data and describe what kind of monitoring would be needed]
+2. **Counties requiring additional oversight:** [Amador, Colusa, Del Norte, Glenn, Inyo, Lassen, Mariposa, Modoc, San Benito, Tehama,Tuolumne. These counties need to be assesed with caution, outcomes should be monitored and retested for bias.]
 
-3. **Counties needing alternative approaches:** [List counties with low confidence data and suggest specific alternatives - manual review, additional surveys, etc.]
+3. **Counties needing alternative approaches:** [Alpine, Mono, Plumas, Sierra, Trinity
+These counties present low confidence of reliability and need to be reassessed before their data is used. Manual review, more surveying, and assessment of recent or impending societal or economic changes in the area should be carried out.]
 
 ## Questions for Further Investigation
 
-[List 2-3 questions that your analysis raised that you'd like to explore further in future assignments. Consider questions about spatial patterns, time trends, or other demographic factors.]
+[1. Once this data is collected by the Census Bureau, what methods are most effective to remedy low reliability.
+
+2. How do you account for obvious impending large scale societal disruptions like covid and economic recessions.]
 
 # Technical Notes
 
 **Data Sources:** 
 - U.S. Census Bureau, American Community Survey 2018-2022 5-Year Estimates
-- Retrieved via tidycensus R package on [date]
+- Retrieved via tidycensus R package on [9/21/25]
 
 **Reproducibility:** 
-- All analysis conducted in R version [your version]
+- All analysis conducted in R version [4.5.1]
 - Census API key required for replication
-- Complete code and documentation available at: [your portfolio URL]
+- Complete code and documentation available at: [https://musa-5080-fall-2025.github.io/portfolio-setup-jrigsbyr5/]
 
 **Methodology Notes:**
-[Describe any decisions you made about data processing, county selection, or analytical choices that might affect reproducibility]
+[The biggest thing I noticed with data processing is that if you continuously alter the same data table than you are left with an extremely filtered and grouped table, so I made sure to assign changes to a new table at every step, even if they were very minor. ]
 
 **Limitations:**
-[Note any limitations in your analysis - sample size issues, geographic scope, temporal factors, etc.]
+[Next time I may opt for a more narrow field than county. If you want to investigate influence on a smaller scale to identify the cause of a specific trend you can not change geographic scale at all with just one field.]
 
 ---
 

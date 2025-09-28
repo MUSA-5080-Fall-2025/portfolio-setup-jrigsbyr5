@@ -18,9 +18,12 @@ website:
         menu:
           - href: labs/lab0/lab0_template.qmd
             text: Lab 0
-          - href: labs/lab1/week3_lab_excercise.qmd
+          - href: labs/My_week_3_folder/week-03/scrips/week3_lab_exercise.qmd
             text: Lab 1
-          
+      - text: Assignments
+        menu:
+          - href: labs/lab1/assignment1_template.qmd
+            text: Assignment 1
 
 
 format:
