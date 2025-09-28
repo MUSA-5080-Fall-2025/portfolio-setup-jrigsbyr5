@@ -1,0 +1,195 @@
+---
+title: "Week 3 Notes"
+date: "2025-09-22"
+---
+
+## Key Concepts Learned
+
+-   \[ggplot2 Commands in R, what they do, and some grammar on them\]
+-   \[EDA Workflow\]
+-   \[More on data reliability\]
+
+## Coding Techniques
+
+-   **ggplot2 – grammar of graphics**
+
+    Data → Aesthetics → Geometries → Visual
+
+    Data: Your dataset (census data, survey responses, etc.)
+
+    Aesthetics: What variables map to visual properties (x, y, color, size)
+
+    Geometries: How to display the data (points, bars, lines)
+
+    Additional layers: Scales, themes, facets, annotations
+
+    g  ggplot (data=acs_data) +
+
+    -I would like to make a plot 
+
+    \- This is a proclamation that gives you a blank plot
+
+    aes or aesthetics is how you draw a connection between data in the table and elements of the plot
+
+    aes ( x = income, y =%bash) +
+
+    geom_points(decorate,colors,sizes)
+
+    **Every ggplot has this pattern:**
+
+    ggplot(data = your_data) +   aes(x = variable1, y = variable2) +   geom_something() +   additional_layers()
+
+    You build plots by adding layers with +
+
+    Quiz question – aesthetics are not for decorating or creating visual elements, you can map color variation by field but not other aesthetic qualities
+
+    **Aesthetics map data to visual properties:**
+
+    x, y - position
+
+    color - point/line color
+
+    fill - area fill color
+
+    size - point/line size
+
+    shape - point shape
+
+    alpha - transparency
+
+    Important: Aesthetics go inside aes(), constants go outside
+
+-   Code for filtering for outliers on boxplot
+
+    \# Identify the outlier counties - REVIEW
+
+    income_outliers \<- county_data %\>%
+
+      mutate(
+
+        Q1 = quantile(median_incomeE, 0.25, na.rm = TRUE),
+
+        Q3 = quantile(median_incomeE, 0.75, na.rm = TRUE),
+
+        IQR = Q3 - Q1,
+
+        outlier = median_incomeE \< (Q1 - 1.5 \* IQR) \| median_incomeE \> (Q3 + 1.5 \* IQR)
+
+      ) %\>%
+
+      filter(outlier) %\>%
+
+      select(county_name, median_incomeE)
+
+    print("Outlier counties:")
+
+    income_outlier
+
+    Explanation,
+
+    1\. mutate(...)
+
+    Inside mutate, you’re calculating statistics that will be the same for every row in the dataset:
+
+    Q1 → the first quartile (25th percentile) of median_incomeE.
+
+    Q3 → the third quartile (75th percentile) of median_incomeE.
+
+    IQR → the interquartile range, i.e. Q3 - Q1.
+
+    This measures the spread of the middle 50% of the data.
+
+    outlier → a logical (TRUE/FALSE) column.
+
+    A county is flagged as an outlier if its median income is:
+
+    Less than Q1 - 1.5 \* IQR (much lower than typical), OR
+
+    Greater than Q3 + 1.5 \* IQR (much higher than typical).
+
+    This is the standard Tukey rule for outlier detection.
+
+    2\. filter(outlier)
+
+    Keeps only the rows (counties) where outlier == TRUE.
+
+    3\. select(county_name, median_incomeE)
+
+    Keeps only the county name and its median income for the outlier counties.
+
+    4\. print("Outlier counties:") and income_outliers
+
+    Prints the label, then shows the filtered table of counties that were identified as outliers.
+
+    Example of calculating correlation on a scatter plot
+
+    edu_income_cor \<- cor(combined_data\$pct_college, combined_data\$median_incomeE, use = "complete.obs")
+
+    print(paste("Education-Income Correlation:", round(edu_income_cor, 3))
+
+-   \*\*Key Tips for Variable Hunting:\*\*
+
+    1.\*\*Start with concepts\*\* - search for the topic you want (income,
+
+    age, housing)
+
+     2. \*\*Look for "Median"\*\* vs "Mean" - median is usually more
+
+    policy-relevant
+
+    3.\*\*Check the universe\*\* - some variables are for "households," others
+
+    for "population"
+
+    4.  \*\*Test with small data\*\* before running large queries
+
+    5.  \*\*Bookmark useful variables\*\* for future projects
+
+## Questions & Challenges
+
+-   \[What I didn't fully understand\]
+-   \[I need more practice with the github interface.\]
+
+## Connections to Policy
+
+-   \[Bad Visualizations Have Real Consequences
+
+    Common problems in government data presentation:
+
+    Misleading scales or axes
+
+    Cherry-picked time periods
+
+    Hidden or ignored uncertainty
+
+    Missing context about data reliability
+
+    -There can be a lot of uncertainty surrounding block level data
+
+    -Census tracts are bigger but have smaller margins of error
+
+-   Exploratory data analysis should take a lot of time – get to know your data.
+
+    **EDA Workflow with Data Quality Focus**
+
+    Enhanced process for policy analysis:
+
+    Load and inspect - dimensions, variable types, missing data
+
+    Assess reliability - examine margins of error, calculate coefficients of variation
+
+    Visualize distributions - histograms, boxplots for each variable
+
+    Explore relationships - scatter plots, correlations
+
+    Identify patterns - grouping, clustering, geographical patterns
+
+    Question anomalies - investigate outliers and unusual patterns
+
+    Document limitations - prepare honest communication about data quality
+
+-   .\]
+
+## Reflection
+
+-   \[I enjoyed learning how to plot so many different types of analysis in R using ggplot, and discovering a more streamlined method for getting and analyzing census data.\]

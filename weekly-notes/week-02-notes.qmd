@@ -2,97 +2,66 @@
 title: "week-02-notes"
 editor: visual
 ---
+
 ## Key Concepts Learned
-- [Basic data operations in R]
-- [Introduction to algorithms and biases]
-- [Introduction to census data and ACS]
 
--[Proxy: What would you use to stand in for what you want?
-Blind spot: What data gap or historical bias could skew results?
-Harm + Guardrail: Who could be harmed, and one simple safeguard?]
+-   \[Basic data operations in R\]
+-   \[Introduction to algorithms and biases\]
+-   \[Introduction to census data and ACS\]
 
--[Most policy analysis happens at:
-County level - state and regional planning
-Census tract level - neighborhood analysis
-Block group level - very local analysis]
+-\[Proxy: What would you use to stand in for what you want? Blind spot: What data gap or historical bias could skew results? Harm + Guardrail: Who could be harmed, and one simple safeguard?\]
 
--[ACS Data Structure
-Data organized in tables:
-B19013 - Median Household Income
-B25003 - Housing Tenure (Own/Rent)
-B15003 - Educational Attainment
-B08301 - Commuting to Work]
+-\[Most policy analysis happens at: County level - state and regional planning Census tract level - neighborhood analysis Block group level - very local analysis\]
 
--[GEOID - Geographic identifier
-NAME - Human-readable location name
-variable - Census variable code
-estimate - The actual value
-moe - Margin of error]
+-\[ACS Data Structure Data organized in tables: B19013 - Median Household Income B25003 - Housing Tenure (Own/Rent) B15003 - Educational Attainment B08301 - Commuting to Work\]
 
+-\[GEOID - Geographic identifier NAME - Human-readable location name variable - Census variable code estimate - The actual value moe - Margin of error\]
 
 ## Coding Techniques
--Check the column names
-colnames(data name)
 
--glimpse
-glimpse(data name)
+-Check the column names colnames(data name)
 
-ncol – get column count
-nrow – get row count
+-glimpse glimpse(data name)
 
--Conversion to data frame
-df <- as.data.frame(data)
+ncol – get column count nrow – get row count
 
--example of multiple selection:
-select(df, Manufacturer, Model, Price)
+-Conversion to data frame df \<- as.data.frame(data)
 
--Select Manufacturer, Price, and Fuel type
-Have to quote Fuel type because there is a space
+-example of multiple selection: select(df, Manufacturer, Model, Price)
+
+-Select Manufacturer, Price, and Fuel type Have to quote Fuel type because there is a space
 
 select(car_data,Price, "Fuel type")
 
-Shortcut is to use minus sign to exclude
-select(car_data,-"Engine size
+Shortcut is to use minus sign to exclude select(car_data,-"Engine size
 
--renaming 
-rename(data, new_name = old_name)
+-renaming rename(data, new_name = old_name)
 
--dplyr syntax for piping a command
-car_data = car_data %>%
-  rename(year = "Year of manufacture")
-  
--Toyota goes in quotation marks but for a different reason than before
-car_data = car_data %>%
-filter(Manufacturer == "Toyota")
+-dplyr syntax for piping a command car_data = car_data %\>% rename(year = "Year of manufacture")
 
--| used for or
+-Toyota goes in quotation marks but for a different reason than before car_data = car_data %\>% filter(Manufacturer == "Toyota")
 
-car_data = car_data %>%
-filter(Manufacturer == "Honda" | Manufacturer == "Nissan")
+-\| used for or
 
+car_data = car_data %\>% filter(Manufacturer == "Honda" \| Manufacturer == "Nissan")
 
-Data Cleaning Essentials
-- str_remove(), str_extract(), str_replace()
+Data Cleaning Essentials - str_remove(), str_extract(), str_replace()
 
-Calculating Data Reliability
-This is crucial for policy work:
-Key functions: case_when() for categories, MOE calculations
+Calculating Data Reliability This is crucial for policy work: Key functions: case_when() for categories, MOE calculations
 
-Professional Tables
-Making results presentation-ready:
-Add descriptive column names and captions
-Format numbers appropriately
-
-
+Professional Tables Making results presentation-ready: Add descriptive column names and captions Format numbers appropriately
 
 ## Questions & Challenges
-- [The step about filtering for disel and age was giving me trouble]
-- [I need to be more careful about the grammar/syntax.]
+
+-   \[The step about filtering for disel and age was giving me trouble\]
+-   \[I need to be more careful about the grammar/syntax.\]
 
 ## Connections to Policy
-- [The lecture had a clear and straightfoward direct connection to policy, but my main takeaway was that manipulating data to drive policy decisions is a far from perfect practice. Despite automation, bias still can creep in at any level and cause major disparity.]
+
+-   \[The lecture had a clear and straightfoward direct connection to policy, but my main takeaway was that manipulating data to drive policy decisions is a far from perfect practice. Despite automation, bias still can creep in at any level and cause major disparity.\]
 
 ## Reflection
-- [I get a better idea of a clear system for performing data analysis for public policy, not necesarily all the technical skills involved yet but the type of data, platforms used, norms in the industry, and possible implications positive or negative.]
 
----
+-   \[I get a better idea of a clear system for performing data analysis for public policy, not necesarily all the technical skills involved yet but the type of data, platforms used, norms in the industry, and possible implications positive or negative.\]
+
+------------------------------------------------------------------------
