@@ -1,0 +1,44 @@
+[
+  {
+    "objectID": "weekly-notes/week-04-notes.html",
+    "href": "weekly-notes/week-04-notes.html",
+    "title": "Week 4 Notes",
+    "section": "",
+    "text": "[Introduction to Spatial Data Analysis]\n[CRS concepts]\n[Vector Data]"
+  },
+  {
+    "objectID": "weekly-notes/week-04-notes.html#key-concepts-learned",
+    "href": "weekly-notes/week-04-notes.html#key-concepts-learned",
+    "title": "Week 4 Notes",
+    "section": "",
+    "text": "[Introduction to Spatial Data Analysis]\n[CRS concepts]\n[Vector Data]"
+  },
+  {
+    "objectID": "weekly-notes/week-04-notes.html#coding-techniques",
+    "href": "weekly-notes/week-04-notes.html#coding-techniques",
+    "title": "Week 4 Notes",
+    "section": "Coding Techniques",
+    "text": "Coding Techniques\nAlways use: pa_counties %&gt;% st_transform(crs = 5070)\nThe .predicate tells st_filter() what spatial relationship to look for: r predicate-structure # Basic structure: st_filter(data_to_filter, reference_geometry, .predicate = relationship) Different questions need different relationships:\nst_filter() | Select features by spatial relationship | Find neighboring counties |\nst_buffer() | Create zones around features | Hospital service areas |\nst_intersects() | Test spatial overlap | Check access to services |\nst_disjoint() | Test spatial separation | Find rural areas |\nst_join() | Join by location | Add county info to tracts |\nst_union() | Combine geometries | Merge overlapping buffers |\nst_intersection() | Clip geometries | Calculate overlap areas |\nst_transform() | Change CRS | Accurate distance/area calculations |\nst_area() | Calculate areas | County sizes, coverage |\nst_distance() | Calculate distances | Distance to facilities |"
+  },
+  {
+    "objectID": "weekly-notes/week-04-notes.html#questions-challenges",
+    "href": "weekly-notes/week-04-notes.html#questions-challenges",
+    "title": "Week 4 Notes",
+    "section": "Questions & Challenges",
+    "text": "Questions & Challenges\n\n[I was unclear on the process for calculating areas under multiple CRS and storing all the data in the same data frame.]"
+  },
+  {
+    "objectID": "weekly-notes/week-04-notes.html#connections-to-policy",
+    "href": "weekly-notes/week-04-notes.html#connections-to-policy",
+    "title": "Week 4 Notes",
+    "section": "Connections to Policy",
+    "text": "Connections to Policy\n\n[Vector data attributes Points → Locations (schools, hospitals, crime incidents) Lines → Linear features (roads, rivers, transit routes) Polygons → Areas (census tracts, neighborhoods, service areas) Each feature has: Geometry → Shape and location Attributes → Data about that feature (population, income, etc.)\n\nShapefiles -.shp - geometrey -.shx -.dbx\nOr Geojson – all embedded\nSpatial operations start with st Dplyr was filter\n\nDifferent questions need different relationships: “Which counties border Allegheny?” → st_touches “Which tracts are IN Allegheny?” → st_within “Which tracts overlap a metro area?” → st_intersects\n\nGCS 1866 Clark – North American Datum 1927 (NAD27) Always a 3d model that runs on lat/long coordinate systems\nStep1: Approximate earths shape with ellipsoid Step2: Tie the ellipsoid to the real earths shape Step 3: Put down lat long grid\nNow Map projection to project 3d coordinates By shape, area, distance, direction\nCan be projected by conic, cylindrical, planar\nProjected coordinate systems are better, local and not built on a distorted grid they are UTM]"
+  },
+  {
+    "objectID": "weekly-notes/week-04-notes.html#reflection",
+    "href": "weekly-notes/week-04-notes.html#reflection",
+    "title": "Week 4 Notes",
+    "section": "Reflection",
+    "text": "Reflection\n\n[My biggest takeaway is that this type of analysis is highly inferential, there is no set or mandatory analyses you must run through. You have to use judgment to decide where to look, what to investigate and what results are significant.]"
+  }
+]
