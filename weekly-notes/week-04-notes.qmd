@@ -1,0 +1,79 @@
+---
+title: "Week 4 Notes"
+date: "2025-09-22"
+---
+
+## Key Concepts Learned
+
+-   \[Introduction to Spatial Data Analysis\]
+-   \[CRS concepts\]
+-   \[Vector Data\]
+
+## Coding Techniques
+
+Always use: pa_counties %>% st_transform(crs = 5070) 
+
+The .predicate tells st_filter() what spatial relationship to look for:
+r predicate-structure # Basic structure: st_filter(data_to_filter, reference_geometry, .predicate = relationship)
+Different questions need different relationships:
+
+| `st_filter()` | Select features by spatial relationship | Find neighboring counties |
+| `st_buffer()` | Create zones around features | Hospital service areas |
+| `st_intersects()` | Test spatial overlap | Check access to services |
+| `st_disjoint()` | Test spatial separation | Find rural areas |
+| `st_join()` | Join by location | Add county info to tracts |
+| `st_union()` | Combine geometries | Merge overlapping buffers |
+| `st_intersection()` | Clip geometries | Calculate overlap areas |
+| `st_transform()` | Change CRS | Accurate distance/area calculations |
+| `st_area()` | Calculate areas | County sizes, coverage |
+| `st_distance()` | Calculate distances | Distance to facilities |
+
+## Questions & Challenges
+
+-   \[I was unclear on the process for calculating areas under multiple CRS
+      and storing all the data in the same data frame.\]
+
+## Connections to Policy
+
+-   \[Vector data attributes
+Points → Locations (schools, hospitals, crime incidents)
+Lines → Linear features (roads, rivers, transit routes)
+Polygons → Areas (census tracts, neighborhoods, service areas)
+Each feature has:
+Geometry → Shape and location
+Attributes → Data about that feature (population, income, etc.)
+
+Shapefiles
+-.shp - geometrey
+-.shx
+-.dbx
+
+Or
+Geojson – all embedded
+
+Spatial operations start with st
+Dplyr was filter
+
+- Different questions need different relationships:
+“Which counties border Allegheny?” → st_touches
+“Which tracts are IN Allegheny?” → st_within
+“Which tracts overlap a metro area?” → st_intersects
+
+GCS
+1866 Clark – North American Datum 1927 (NAD27)
+Always a 3d model that runs on lat/long coordinate systems
+
+Step1: Approximate earths shape with ellipsoid
+Step2: Tie the ellipsoid to the real earths shape
+Step 3: Put down lat long grid
+
+Now Map  projection to project 3d coordinates
+By shape, area, distance, direction
+
+Can be projected by conic, cylindrical, planar
+
+Projected coordinate systems are better, local and not built on a distorted grid they are UTM\]
+
+## Reflection
+
+-   \[My biggest takeaway is that this type of analysis is highly inferential, there is no set or mandatory analyses you must run through. You have to use judgment to decide where to look, what to investigate and what results are significant.\]
