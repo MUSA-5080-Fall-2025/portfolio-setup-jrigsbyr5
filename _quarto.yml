@@ -18,6 +18,9 @@ website:
             text: Week 3
           - href: weekly-notes/week-04-notes.qmd
             text: Week 4
+          - href: weekly-notes/week-05-notes.qmd
+            text: Week 5
+            
       - text: Labs
         menu:
           - href: labs/lab0/lab0_template.qmd
@@ -28,6 +31,8 @@ website:
         menu:
           - href: labs/lab1/assignment1_template.qmd
             text: Assignment 1
+          - href: labs/assignment_2/Rigsby_Joshua_Assignment2.qmd
+            text: Assignment 2
 
 
 format:

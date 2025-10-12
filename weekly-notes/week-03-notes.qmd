@@ -133,7 +133,7 @@ date: "2025-09-22"
 
     age, housing)
 
-     2. \*\*Look for "Median"\*\* vs "Mean" - median is usually more
+    2.  \*\*Look for "Median"\*\* vs "Mean" - median is usually more
 
     policy-relevant
 

@@ -1,0 +1,228 @@
+---
+title: "Week 5 Notes"
+date: "2025-10-06"
+---
+
+## Key Concepts Learned
+
+-   Introduction to Statistical Prediction
+-   Linear Regression
+-   Evaluating outputs
+-   Improving the model
+
+## Coding Techniques
+
+-Fit the Model
+model1 <- lm(median_incomeE ~ total_popE, data = pa_data)
+summary(model1)
+here we are trying to predict median income as a function of total population.
+
+-How to check: Residual plot
+pa_data$residuals <- residuals(model1)
+pa_data$fitted <- fitted(model1)
+
+ggplot(pa_data, aes(x = fitted, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residual Plot", x = "Fitted Values", y = "Residuals") +
+  theme_minimal()
+  
+-Train/Test Split
+set.seed(123)
+n <- nrow(pa_data)
+
+70% training, 30% testing
+train_indices <- sample(1:n, size = 0.7 * n)
+train_data <- pa_data[train_indices, ]
+test_data <- pa_data[-train_indices, ]
+
+Fit on training data only
+model_train <- lm(median_incomeE ~ total_popE, data = train_data)
+
+Predict on test data
+test_predictions <- predict(model_train, newdata = test_data)
+
+-Calculate prediction error (RMSE)
+rmse_test <- sqrt(mean((test_data$median_incomeE - test_predictions)^2))
+rmse_train <- summary(model_train)$sigma
+
+cat("Training RMSE:", round(rmse_train, 0), "\n")
+
+-Cross validation
+library(caret)
+
+10-fold cross-validation
+train_control <- trainControl(method = "cv", number = 10)
+
+cv_model <- train(median_incomeE ~ total_popE,
+                  data = pa_data,
+                  method = "lm",
+                  trControl = train_control)
+
+cv_model$results
+
+-VIF
+library(car)
+vif(model1)  # Variance Inflation Factor
+
+Rule of thumb: VIF > 10 suggests problems
+Not relevant with only 1 predictor
+
+-Log transformations
+Compare linear vs log
+model_linear <- lm(median_incomeE ~ total_popE, data = pa_data)
+model_log <- lm(median_incomeE ~ log(total_popE), data = pa_data)
+
+summary(model_log)
+
+
+## Questions & Challenges
+
+- I was unclear on the process for training and test splitting data
+
+## Connections to Policy
+
+-In this class linear regression is focused on prediction
+
+-Statistical learning = a set of approaches for estimating that relationship
+
+-For any quantitative response Y and predictors X₁, X₂, … Xₚ:
+𝑌=𝑓(𝑋)+𝜖
+
+Where:
+f = the systematic information X provides about Y
+ε = random error (irreducible)
+
+-Example:
+Y = median income
+X = population, education, poverty rate
+f = the way these factors systematically relate to income
+
+parametric method 
+-simpler
+-easier to interpret
+
+
+-Parametric Approach: Linear Regression
+The assumption: Relationship between X and Y is linear
+𝑌≈𝛽0+𝛽1𝑋1+𝛽2𝑋2+...+𝛽𝑝𝑋𝑝
+
+The task: Estimate the β coefficients using our sample data
+The method: Ordinary Least Squares (OLS)
+
+-What is the intercept and slope of the line that best describes the relationship between the variables
+
+-Just estimating the intercept and the slope
+
+-Interpreting Coefficients
+Intercept (β₀) = $62,855
+Expected income when population = 0
+Not usually meaningful in practice
+Slope (β₁) = $0.02
+For each additional person, income increases by $0.02
+More useful: For every 1,000 people, income increases by ~$20
+Is this relationship real?
+p-value < 0.001 → Very unlikely to see this if true β₁ = 0
+We can reject the null hypothesis
+
+Statistical Significance
+The logic:
+Null hypothesis (H₀): β₁ = 0 (no relationship)
+Our estimate: β₁ = 0.02
+Question: Could we get 0.02 just by chance if H₀ is true?
+
+Could we get a slope of 0.02 by chance if h0 is true or what is the probability that we would get the estimate b1=.02 in the case that h0 is actually true. That probability or p-value was very small so reject the null hypothesis or h0
+
+p-value: Probability of seeing our estimate if H₀ is true
+Small p → reject H₀, conclude relationship exists
+
+In the output there is a .01% chance that the actual slope is zero so reject the h0
+
+-Deciding if the model is good
+-can use r2
+
+-In-Sample Fit: R²
+R² = 0.208
+“21% of variation in income is explained by population”
+Is this good?
+
+Depends on your goal!
+For prediction: Moderate
+For inference: Shows population matters, but other factors exist
+R² alone doesn’t tell us if the model is trustworthy
+
+-higher r2 is a better explained model but that’s it
+-higher r2 also doesn’t mean good predictions
+
+-The Problem: Overfitting
+Three scenarios:
+Underfitting: Model too simple (high bias)
+Good fit: Captures pattern without noise
+Overfitting: Memorizes training data (high variance)
+
+-Cross-Validation
+Better approach: Multiple train/test splits
+Gives more stable estimate of true prediction performance
+
+-Key Metrics (Averaged Across 10 Folds)
+RMSE: Typical prediction error (~$12,578)
+R²: % of variation explained (0.564)
+MAE: Average absolute error (~$8,860) - easier to interpret
+
+Assumptions:
+
+Assumption 1: Linearity
+What we assume: Relationship is actually linear
+How to check: Residual plot
+pa_data$residuals <- residuals(model1)
+pa_data$fitted <- fitted(model1)
+
+ggplot(pa_data, aes(x = fitted, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residual Plot", x = "Fitted Values", y = "Residuals") +
+  theme_minimal()
+
+Assumption 2: Constant Variance
+Heteroscedasticity: Variance changes across X
+Impact: Standard errors are wrong → p-values misleading
+What Heteroskedasticity Tells You
+Often a symptom of model misspecification:
+
+Model fits well for some values (e.g., small counties) but poorly for others (large counties)
+May indicate missing variables that matter more at certain X values
+Ask: “What’s different about observations with large residuals?”
+
+Assumption: Normality of Residuals
+What we assume: Residuals are normally distributed
+Why it matters:
+Less critical for point predictions (unbiased regardless)
+Important for confidence intervals and prediction intervals
+Needed for valid hypothesis tests (t-tests, F-tests)
+
+-doesn’t affect beta coefficients if they aren’t normal
+-use qq plot of residuals to test
+
+
+Assumption 3: No Multicollinearity
+For multiple regression: Predictors shouldn’t be too correlated
+library(car)
+vif(model1)  # Variance Inflation Factor
+
+Rule of thumb: VIF > 10 suggests problems
+Not relevant with only 1 predictor!
+
+Why it matters: Coefficients become unstable, hard to interpret
+
+Assumption 4: No Influential Outliers
+Not all outliers are problems - only those with high leverage AND large residuals
+
+-Ways to improve
+-add more predictors
+-log transformation
+-categorical variables – r can add dummy variables
+
+
+## Reflection
+
+- This lecture made alot clear, as we have been learning about all of these things in the statistics course, but to see some of it in practice and phrased differently was helpful.
