@@ -31,6 +31,10 @@ website:
             text: Assignment 1
           - href: labs/lab2/Rigsby_Joshua_Assignment2.qmd
             text: Assignment 2
+          - href: labs/lab3_midterm/Midterm_2025_Slides.qmd
+            text: Midterm Slides
+          - href: labs/lab3_midterm/Midterm_2025_Technical_Appendix.qmd
+            text: Midterm Technical Appendix
 format:
   html:
     theme: cosmo
