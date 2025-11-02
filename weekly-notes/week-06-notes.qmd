@@ -1,0 +1,172 @@
+---
+title: "Week 6 Notes"
+date: "2025-10-13"
+---
+
+## Key Concepts Learned
+
+-   Linear Regression
+-   Model Performance
+-   Spatial Features
+
+## Coding Techniques
+
+-Converting to Spatial Data
+# Convert boston data to sf object
+boston.sf <- boston %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+  st_transform('ESRI:102286')  # MA State Plane (feet)
+
+-Interactions
+Model 1: No Interaction (Parallel Slopes)
+# Model assumes same slope everywhere
+model_no_interact <- lm(SalePrice ~ LivingArea + wealthy_neighborhood, 
+                        data = boston.sf)
+
+summary(model_no_interact)$coe
+Estimate Std. Error t value Pr(>|t|) (Intercept) 213842.7642 23893.619394 8.949785 1.039392e-18 LivingArea 160.2357 9.713346 16.496442 2.936087e-56 wealthy_neighborhoodWealthy 2591012.0471 59958.794614 43.213211 1.103579e-264
+
+
+Model 2: With Interaction (Different Slopes)
+# Model allows different slopes
+model_interact <- lm(SalePrice ~ LivingArea * wealthy_neighborhood, 
+                     data = boston.sf)
+
+summary(model_interact)$coef
+                                            Estimate   Std. Error   t value
+(Intercept)                             358542.41696 1.863997e+04 19.235144
+LivingArea                                  95.63947 7.620382e+00 12.550483
+wealthy_neighborhoodWealthy            -377937.38372 1.005554e+05 -3.758498
+LivingArea:wealthy_neighborhoodWealthy     985.12500 2.975904e+01 33.103383
+                                            Pr(>|t|)
+(Intercept)                             8.875710e-74
+LivingArea                              2.079700e-34
+wealthy_neighborhoodWealthy             1.775774e-04
+LivingArea:wealthy_neighborhoodWealthy 2.445570e-180
+
+Create Age Variable
+# Calculate age from year built
+boston.sf <- boston.sf %>%
+  mutate(Age = 2025 - YR_BUILT)%>% filter(Age <2000)
+
+
+# Check the distribution of age
+summary(boston.sf$Age)
+
+
+First: Linear Model (Baseline)
+# Simple linear relationship
+model_age_linear <- lm(SalePrice ~ Age + LivingArea, data = boston.sf)
+
+summary(model_age_linear)$coef
+
+                Estimate  Std. Error   t value     Pr(>|t|)
+(Intercept) -120808.8738 57836.98918 -2.088782 3.689911e-02
+Age            2834.0198   497.72013  5.694003 1.496246e-08
+LivingArea      202.8312    15.10373 13.429214 7.228187e-39
+Interpretation: Each additional year of age changes price by $2834.01 (assumed constant rate)
+
+Add Polynomial Term: Age Squared
+# Quadratic model (Age²)
+model_age_quad <- lm(SalePrice ~ Age + I(Age^2) + LivingArea, data = boston.sf)
+
+summary(model_age_quad)$coef
+
+                Estimate   Std. Error   t value     Pr(>|t|)
+(Intercept) 570397.14406 97894.237962  5.826667 6.938345e-09
+Age         -13007.51918  1896.446156 -6.858892 1.019524e-11
+I(Age^2)        80.88988     9.360652  8.641479 1.425208e-17
+LivingArea     203.75007    14.739041 13.823835 5.975020e-41
+
+
+Compare Model Performance
+# R-squared comparison
+r2_linear <- summary(model_age_linear)$r.squared
+r2_quad <- summary(model_age_quad)$r.squared
+
+cat("Linear model R²:", round(r2_linear, 4), "\n")
+Linear model R²: 0.1549 
+cat("Quadratic model R²:", round(r2_quad, 4), "\n")
+Quadratic model R²: 0.1959 
+cat("Improvement:", round(r2_quad - r2_linear, 4), "\n\n")
+Improvement: 0.0409 
+# F-test: Is the Age² term significant?
+anova(model_age_linear, model_age_quad)
+Analysis of Variance Table
+
+Model 1: SalePrice ~ Age + LivingArea
+Model 2: SalePrice ~ Age + I(Age^2) + LivingArea
+  Res.Df        RSS Df  Sum of Sq      F    Pr(>F)    
+1   1469 4.5786e+14                                   
+2   1468 4.3569e+14  1 2.2163e+13 74.675 < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+
+
+## Questions & Challenges
+
+- I was unclear on how to detect interactions
+
+## Connections to Policy
+
+Dummy Variables
+Our Boston Data: name variable from spatial join
+
+When you include name in a model, R automatically creates binary indicators:
+Back_Bay: 1 if Back Bay, 0 otherwise
+Beacon_Hill: 1 if Beacon Hill, 0 otherwise
+
+Interaction Effects: When Relationships Depend
+
+Polynomial Terms: Non-Linear Relationships
+When Straight Lines Don’t Fit
+
+Signs of Non-Linearity:
+Curved residual plots
+Diminishing returns
+Accelerating effects
+U-shaped or inverted-U patterns
+Theoretical reasons
+
+
+Theory: The U-Shaped Age Effect
+Why Would Age Have a Non-Linear Effect?
+
+Three Approaches to Spatial Features
+
+1.	Buffer Aggregation
+Count or sum events within a defined distance
+Example: Number of crimes within 500 feet
+
+2.	k-Nearest Neighbors (kNN)
+Average distance to k closest events
+Example: Average distance to 3 nearest violent crimes
+
+3.	Distance to Specific Points
+Straight-line distance to important locations
+Example: Distance to downtown, nearest T station
+
+
+Fixed Effects = Categorical variables that capture all unmeasured characteristics of a group
+Basically a dummy or categorical variable that we cant capture
+
+
+Why Use Fixed Effects?
+Dramatically Improve Prediction
+Model Comparison (R²):
+- Structural only:     0.58
+- + Spatial features:  0.67
+- + Fixed Effects:     0.81 ✓
+Why such a big jump?
+•	Neighborhoods bundle many unmeasured factors
+•	School districts
+•	Job access
+•	Amenities
+•	“Cool factor”
+
+
+
+## Reflection
+
+It is becoming more clear that certainty or even near certainty will not be achieved.

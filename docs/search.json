@@ -84,6 +84,48 @@
     "text": "Before submitting, make sure you’ve: - [ ] Customized _quarto.yml with your name - [ ] Updated index.qmd with your information - [ ] Completed Week 1 notes - [ ] Enabled GitHub Pages - [ ] Verified your website loads correctly - [ ] Submitted your URL to Canvas\n\nNeed help? Don’t struggle alone - reach out during office hours (mine + TAs) or in class!"
   },
   {
+    "objectID": "weekly-notes/week-07-notes.html",
+    "href": "weekly-notes/week-07-notes.html",
+    "title": "Week 7 Notes",
+    "section": "",
+    "text": "Spatial Autocorrelation\nMorans I"
+  },
+  {
+    "objectID": "weekly-notes/week-07-notes.html#key-concepts-learned",
+    "href": "weekly-notes/week-07-notes.html#key-concepts-learned",
+    "title": "Week 7 Notes",
+    "section": "",
+    "text": "Spatial Autocorrelation\nMorans I"
+  },
+  {
+    "objectID": "weekly-notes/week-07-notes.html#coding-techniques",
+    "href": "weekly-notes/week-07-notes.html#coding-techniques",
+    "title": "Week 7 Notes",
+    "section": "Coding Techniques",
+    "text": "Coding Techniques\nVisualizing Error Patterns\nScatter Plot: Spatial Lag of Errors Create the spatial lag: library(spdep)"
+  },
+  {
+    "objectID": "weekly-notes/week-07-notes.html#questions-challenges",
+    "href": "weekly-notes/week-07-notes.html#questions-challenges",
+    "title": "Week 7 Notes",
+    "section": "Questions & Challenges",
+    "text": "Questions & Challenges\n\nIm wondering if spatial autocorrelation is a negative trend? It seems like when spatial autocorrelation is present it would provide useful information?"
+  },
+  {
+    "objectID": "weekly-notes/week-07-notes.html#connections-to-policy",
+    "href": "weekly-notes/week-07-notes.html#connections-to-policy",
+    "title": "Week 7 Notes",
+    "section": "Connections to Policy",
+    "text": "Connections to Policy\nSpatial Autocorrelation can occur when a variable is similar or dissimilar across space in relation to grouped neighbors. As data analysts we have to try to identify this phenomenon and adjust to combat it or figure out why its happening and what the significance of it could be.\nThe formula is really just asking: “When I’m above/below average, are my neighbors also above/below average?” Breaking it down: (𝑥𝑖−𝑥¯) = How far is my house’s error from the mean? (𝑥𝑗−𝑥¯) = How far is my neighbor’s error from the mean? Multiply them: If both positive or both negative → positive product (similar) If opposite signs → negative product (dissimilar) Sum across all neighbor pairs and normalize Result: Lots of positive products → High Moran’s I (clustering) Products near zero → Low Moran’s I (random) Negative products → Negative Moran’s I (rare with errors)"
+  },
+  {
+    "objectID": "weekly-notes/week-07-notes.html#reflection",
+    "href": "weekly-notes/week-07-notes.html#reflection",
+    "title": "Week 7 Notes",
+    "section": "Reflection",
+    "text": "Reflection\nA main takeaway was that clustering and spatial autocorrelation could just be information that the model hasn’t captured yet, potentially a missing geographical variable, neighborhood effects, school districts, access to amenities etc. . Spatial statistics is less about eliminating patterns and more about understanding why those patterns exist."
+  },
+  {
     "objectID": "weekly-notes/week-04-notes.html",
     "href": "weekly-notes/week-04-notes.html",
     "title": "Week 4 Notes",
@@ -656,5 +698,47 @@
     "title": "Week 1 Notes - Course Introduction",
     "section": "Reflection",
     "text": "Reflection\n\n[Most interesting was learning how the github portfolio website operates, and how we can periodically change it.]\n[I assume that as the semester progresses we will use this website to display our body of work]"
+  },
+  {
+    "objectID": "weekly-notes/week-06-notes.html",
+    "href": "weekly-notes/week-06-notes.html",
+    "title": "Week 6 Notes",
+    "section": "",
+    "text": "Linear Regression\nModel Performance\nSpatial Features"
+  },
+  {
+    "objectID": "weekly-notes/week-06-notes.html#key-concepts-learned",
+    "href": "weekly-notes/week-06-notes.html#key-concepts-learned",
+    "title": "Week 6 Notes",
+    "section": "",
+    "text": "Linear Regression\nModel Performance\nSpatial Features"
+  },
+  {
+    "objectID": "weekly-notes/week-06-notes.html#coding-techniques",
+    "href": "weekly-notes/week-06-notes.html#coding-techniques",
+    "title": "Week 6 Notes",
+    "section": "Coding Techniques",
+    "text": "Coding Techniques\n-Converting to Spatial Data # Convert boston data to sf object boston.sf &lt;- boston %&gt;% st_as_sf(coords = c(“Longitude”, “Latitude”), crs = 4326) %&gt;% st_transform(‘ESRI:102286’) # MA State Plane (feet)\n-Interactions Model 1: No Interaction (Parallel Slopes) # Model assumes same slope everywhere model_no_interact &lt;- lm(SalePrice ~ LivingArea + wealthy_neighborhood, data = boston.sf)\nsummary(model_no_interact)$coe Estimate Std. Error t value Pr(&gt;|t|) (Intercept) 213842.7642 23893.619394 8.949785 1.039392e-18 LivingArea 160.2357 9.713346 16.496442 2.936087e-56 wealthy_neighborhoodWealthy 2591012.0471 59958.794614 43.213211 1.103579e-264\nModel 2: With Interaction (Different Slopes) # Model allows different slopes model_interact &lt;- lm(SalePrice ~ LivingArea * wealthy_neighborhood, data = boston.sf)\nsummary(model_interact)$coef Estimate Std. Error t value (Intercept) 358542.41696 1.863997e+04 19.235144 LivingArea 95.63947 7.620382e+00 12.550483 wealthy_neighborhoodWealthy -377937.38372 1.005554e+05 -3.758498 LivingArea:wealthy_neighborhoodWealthy 985.12500 2.975904e+01 33.103383 Pr(&gt;|t|) (Intercept) 8.875710e-74 LivingArea 2.079700e-34 wealthy_neighborhoodWealthy 1.775774e-04 LivingArea:wealthy_neighborhoodWealthy 2.445570e-180\nCreate Age Variable # Calculate age from year built boston.sf &lt;- boston.sf %&gt;% mutate(Age = 2025 - YR_BUILT)%&gt;% filter(Age &lt;2000)"
+  },
+  {
+    "objectID": "weekly-notes/week-06-notes.html#questions-challenges",
+    "href": "weekly-notes/week-06-notes.html#questions-challenges",
+    "title": "Week 6 Notes",
+    "section": "Questions & Challenges",
+    "text": "Questions & Challenges\n\nI was unclear on how to detect interactions"
+  },
+  {
+    "objectID": "weekly-notes/week-06-notes.html#connections-to-policy",
+    "href": "weekly-notes/week-06-notes.html#connections-to-policy",
+    "title": "Week 6 Notes",
+    "section": "Connections to Policy",
+    "text": "Connections to Policy\nDummy Variables Our Boston Data: name variable from spatial join\nWhen you include name in a model, R automatically creates binary indicators: Back_Bay: 1 if Back Bay, 0 otherwise Beacon_Hill: 1 if Beacon Hill, 0 otherwise\nInteraction Effects: When Relationships Depend\nPolynomial Terms: Non-Linear Relationships When Straight Lines Don’t Fit\nSigns of Non-Linearity: Curved residual plots Diminishing returns Accelerating effects U-shaped or inverted-U patterns Theoretical reasons\nTheory: The U-Shaped Age Effect Why Would Age Have a Non-Linear Effect?\nThree Approaches to Spatial Features\n\nBuffer Aggregation Count or sum events within a defined distance Example: Number of crimes within 500 feet\nk-Nearest Neighbors (kNN) Average distance to k closest events Example: Average distance to 3 nearest violent crimes\nDistance to Specific Points Straight-line distance to important locations Example: Distance to downtown, nearest T station\n\nFixed Effects = Categorical variables that capture all unmeasured characteristics of a group Basically a dummy or categorical variable that we cant capture\nWhy Use Fixed Effects? Dramatically Improve Prediction Model Comparison (R²): - Structural only: 0.58 - + Spatial features: 0.67 - + Fixed Effects: 0.81 ✓ Why such a big jump? • Neighborhoods bundle many unmeasured factors • School districts • Job access • Amenities • “Cool factor”"
+  },
+  {
+    "objectID": "weekly-notes/week-06-notes.html#reflection",
+    "href": "weekly-notes/week-06-notes.html#reflection",
+    "title": "Week 6 Notes",
+    "section": "Reflection",
+    "text": "Reflection\nIt is becoming more clear that certainty or even near certainty will not be achieved."
   }
 ]

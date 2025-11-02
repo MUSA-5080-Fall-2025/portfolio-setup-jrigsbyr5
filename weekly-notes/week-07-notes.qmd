@@ -1,0 +1,90 @@
+---
+title: "Week 7 Notes"
+date: "2025-10-20"
+---
+
+## Key Concepts Learned
+
+-   Spatial Autocorrelation
+-   Morans I
+
+## Coding Techniques
+
+Visualizing Error Patterns
+
+Scatter Plot: Spatial Lag of Errors
+Create the spatial lag:
+library(spdep)
+
+# Define neighbors (5 nearest)
+coords <- st_coordinates(boston_test)
+neighbors <- knn2nb(knearneigh(coords, k=5))
+weights <- nb2listw(neighbors, style="W")
+
+# Calculate spatial lag of errors
+boston_test$error_lag <- lag.listw(weights, boston_test$error)
+
+
+For point data (houses), use k-nearest neighbors
+This also creates weights
+# Create 5-nearest neighbors
+coords <- st_coordinates(boston_test)
+nb <- knn2nb(knearneigh(coords, k=5))
+weights <- nb2listw(nb, style="W")
+
+then calculate spatial lag:
+boston$price_lag <- lag.listw(weights, boston$SalePrice)
+
+Computing Moran’s I
+Calculate Moran’s I for your errors:
+# Test for spatial autocorrelation in errors
+moran_test <- moran.mc(
+  boston_test$error,        # Your errors
+  weights,                  # Spatial weights matrix
+  nsim = 999                # Number of permutations
+)
+
+# View results
+moran_test$statistic         # Moran's I value
+
+statistic 
+0.7186593 
+moran_test$p.value          # Is it significant?
+
+[1] 0.001
+Interpretation:
+I > 0 and p < 0.05 → Significant clustering
+I ≈ 0 → Random pattern (good)
+I < 0 → Dispersion (rare with errors)
+
+
+
+## Questions & Challenges
+
+- Im wondering if spatial autocorrelation is a negative trend? It seems like when spatial autocorrelation is present it would provide useful information?
+
+## Connections to Policy
+
+
+Spatial Autocorrelation can occur when a variable is similar or dissimilar across space in relation to grouped neighbors. As data analysts we have to try to identify this phenomenon and adjust to combat it or figure out why its happening and what the significance of it could be.
+
+
+The formula is really just asking:
+“When I’m above/below average, are my neighbors also above/below average?”
+Breaking it down:
+(𝑥𝑖−𝑥¯) = How far is my house’s error from the mean?
+(𝑥𝑗−𝑥¯) = How far is my neighbor’s error from the mean?
+Multiply them:
+If both positive or both negative → positive product (similar)
+If opposite signs → negative product (dissimilar)
+Sum across all neighbor pairs and normalize
+Result:
+Lots of positive products → High Moran’s I (clustering)
+Products near zero → Low Moran’s I (random)
+Negative products → Negative Moran’s I (rare with errors)
+
+
+
+## Reflection
+
+A main takeaway was that clustering and spatial autocorrelation could just be information that the model hasn’t captured yet, potentially a missing geographical variable, neighborhood effects, school districts, access to amenities etc. . Spatial statistics is less about eliminating patterns and more about understanding why those patterns exist.
