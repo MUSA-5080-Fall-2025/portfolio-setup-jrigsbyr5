@@ -47,7 +47,7 @@ website:
             text: Midterm Slides
           - href: labs/lab3_midterm/Midterm_2025_Technical_Appendix.qmd
             text: Midterm Technical Appendix
-          - href: labs/lab4/Actual Assignment 4 copy.qmd
+          - href: labs/lab4/actual_assignment_4_copy.qmd
             text: Assignmnet 4
           
 format:
