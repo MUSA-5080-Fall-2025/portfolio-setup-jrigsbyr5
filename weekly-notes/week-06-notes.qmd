@@ -12,14 +12,14 @@ date: "2025-10-13"
 ## Coding Techniques
 
 -Converting to Spatial Data
-# Convert boston data to sf object
+## Convert boston data to sf object
 boston.sf <- boston %>%
   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
   st_transform('ESRI:102286')  # MA State Plane (feet)
 
 -Interactions
 Model 1: No Interaction (Parallel Slopes)
-# Model assumes same slope everywhere
+## Model assumes same slope everywhere
 model_no_interact <- lm(SalePrice ~ LivingArea + wealthy_neighborhood, 
                         data = boston.sf)
 
@@ -28,7 +28,7 @@ Estimate Std. Error t value Pr(>|t|) (Intercept) 213842.7642 23893.619394 8.9497
 
 
 Model 2: With Interaction (Different Slopes)
-# Model allows different slopes
+## Model allows different slopes
 model_interact <- lm(SalePrice ~ LivingArea * wealthy_neighborhood, 
                      data = boston.sf)
 
@@ -45,17 +45,17 @@ wealthy_neighborhoodWealthy             1.775774e-04
 LivingArea:wealthy_neighborhoodWealthy 2.445570e-180
 
 Create Age Variable
-# Calculate age from year built
+## Calculate age from year built
 boston.sf <- boston.sf %>%
   mutate(Age = 2025 - YR_BUILT)%>% filter(Age <2000)
 
 
-# Check the distribution of age
+## Check the distribution of age
 summary(boston.sf$Age)
 
 
 First: Linear Model (Baseline)
-# Simple linear relationship
+## Simple linear relationship
 model_age_linear <- lm(SalePrice ~ Age + LivingArea, data = boston.sf)
 
 summary(model_age_linear)$coef
@@ -67,7 +67,7 @@ LivingArea      202.8312    15.10373 13.429214 7.228187e-39
 Interpretation: Each additional year of age changes price by $2834.01 (assumed constant rate)
 
 Add Polynomial Term: Age Squared
-# Quadratic model (Age²)
+## Quadratic model (Age²)
 model_age_quad <- lm(SalePrice ~ Age + I(Age^2) + LivingArea, data = boston.sf)
 
 summary(model_age_quad)$coef
@@ -80,7 +80,7 @@ LivingArea     203.75007    14.739041 13.823835 5.975020e-41
 
 
 Compare Model Performance
-# R-squared comparison
+## R-squared comparison
 r2_linear <- summary(model_age_linear)$r.squared
 r2_quad <- summary(model_age_quad)$r.squared
 
@@ -90,7 +90,7 @@ cat("Quadratic model R²:", round(r2_quad, 4), "\n")
 Quadratic model R²: 0.1959 
 cat("Improvement:", round(r2_quad - r2_linear, 4), "\n\n")
 Improvement: 0.0409 
-# F-test: Is the Age² term significant?
+## F-test: Is the Age² term significant?
 anova(model_age_linear, model_age_quad)
 Analysis of Variance Table
 

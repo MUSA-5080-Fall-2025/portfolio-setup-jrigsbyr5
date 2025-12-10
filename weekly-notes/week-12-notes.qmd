@@ -1,0 +1,86 @@
+---
+title: "Week 12 Notes"
+date: "2025-11-24"
+---
+
+## Key Concepts Learned
+
+- K Means Clustering
+- Sequence Analysis
+
+## Coding Techniques
+
+## K-means Clustering
+K-means is an unsupervised machine learning algorithm
+•	Groups observations into k clusters based on similarity
+•	Assigns each observation to the cluster with the nearest mean (centroid)
+•	Iteratively updates cluster assignments and centroids until convergence
+Why unsupervised? We don’t tell the algorithm what makes a “gentrifying” vs. “declining” neighborhood - it discovers patterns in the data
+From Clusters to Sequences
+Once each neighborhood is classified at each time point:
+Before: Each tract has 5 separate cluster assignments
+Tract 123:  1980=1, 1990=1, 2000=3, 2010=3, 2020=3
+After: Each tract has one sequence describing its trajectory
+Tract 123:  White → White → Hispanic → Hispanic → Hispanic
+Result: Each neighborhood has a “signature” of change over time
+Creating the Sequence Object
+## Reshape to wide format (one row per tract)
+census_wide <- census_data %>%
+  select(tract, year, cluster) %>%
+  pivot_wider(names_from = year, values_from = cluster)
+
+## Define sequence object with TraMineR
+seq_data <- seqdef(
+  census_wide,
+  var = c("1980", "1990", "2000", "2010", "2020"),
+  labels = c("White", "Black", "Hispanic", "Asian", 
+             "Black/Hisp", "White Mixed")
+)
+
+
+
+Computing OMstrans Dissimilarity
+## Calculate transition-based substitution costs
+submat <- seqsubm(seq_data, method = "TRATE", 
+                  transition = "both")
+
+## Compute OMstrans dissimilarity
+dist_omstrans <- seqdist(
+  seq_data,
+  method = "OMstrans",  # Note: OMstrans, not OM
+  indel = 1,            # insertion/deletion cost
+  sm = submat,          # substitution cost matrix
+  otto = 0.1            # origin-transition tradeoff
+)
+Key parameter: otto (origin-transition tradeoff) - lower values emphasize sequencing
+
+Understanding the Parameters
+indel = 1: Cost for insertion/deletion operations
+•	Higher values = less time-warping allowed
+•	Tutorial uses 1 (half of max substitution cost)
+otto = 0.1: Origin-transition tradeoff parameter
+•	Lower values = emphasize sequencing of transitions
+•	Tutorial uses 0.1 to prioritize order of change
+norm = TRUE: Normalize distances by sequence length
+•	Ensures fair comparison across different-length sequences
+
+
+## Understanding the Cost Matrix
+Substitution costs based on transition frequencies:
+•	Rare transitions = HIGH cost (e.g., Hispanic → Asian)
+•	Common transitions = LOW cost (e.g., White → White Mixed)
+ 
+Inverse Transition Matrix for Costs
+Intuition: Neighborhoods following rare pathways are dissimilar
+
+## Questions & Challenges
+
+Interpreting clusters meaningfully remains slightly unclear. Because clustering is unsupervised, clusters do not automatically correspond to intuitive labels, and therefore it seems interpreting clusters requires careful distinction and judgment.
+
+## Connections to Policy
+
+Rather than asking what a neighborhood looks like today, this approach reveals how it has changed over decades and whether it follows common or rare pathways. For policymakers, identifying common transition patterns can inform proactive interventions. Rare sequences may signal neighborhoods at risk of displacement or instability, warranting closer attention.
+
+## Reflection
+
+This lecture highlighted how unsupervised methods can uncover structure without predefined categories, but also how much interpretation they require. K-means simplifies complex data, but the meaning of each cluster is not intrinsic and must be inferred carefully.

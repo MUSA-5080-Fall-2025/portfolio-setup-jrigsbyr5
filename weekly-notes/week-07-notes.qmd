@@ -16,18 +16,18 @@ Scatter Plot: Spatial Lag of Errors
 Create the spatial lag:
 library(spdep)
 
-# Define neighbors (5 nearest)
+## Define neighbors (5 nearest)
 coords <- st_coordinates(boston_test)
 neighbors <- knn2nb(knearneigh(coords, k=5))
 weights <- nb2listw(neighbors, style="W")
 
-# Calculate spatial lag of errors
+## Calculate spatial lag of errors
 boston_test$error_lag <- lag.listw(weights, boston_test$error)
 
 
 For point data (houses), use k-nearest neighbors
 This also creates weights
-# Create 5-nearest neighbors
+## Create 5-nearest neighbors
 coords <- st_coordinates(boston_test)
 nb <- knn2nb(knearneigh(coords, k=5))
 weights <- nb2listw(nb, style="W")
@@ -37,14 +37,14 @@ boston$price_lag <- lag.listw(weights, boston$SalePrice)
 
 Computing Moran’s I
 Calculate Moran’s I for your errors:
-# Test for spatial autocorrelation in errors
+## Test for spatial autocorrelation in errors
 moran_test <- moran.mc(
   boston_test$error,        # Your errors
   weights,                  # Spatial weights matrix
   nsim = 999                # Number of permutations
 )
 
-# View results
+## View results
 moran_test$statistic         # Moran's I value
 
 statistic 

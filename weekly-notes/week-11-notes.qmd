@@ -1,90 +1,177 @@
 ---
-title: "Week 7 Notes"
-date: "2025-10-20"
+title: "Week 11 Notes"
+date: "2025-11-17"
 ---
 
 ## Key Concepts Learned
 
--   Spatial Autocorrelation
--   Morans I
+- Panel data: Same stations observed over time
+- Temporal features: What happened last hour?
+- Space-time interaction: Different patterns by location AND time
 
 ## Coding Techniques
 
-Visualizing Error Patterns
+## Panel Data
+Definition: Data that follows the same units over multiple time periods
+Bike example, station ID for hour 0 1 2 3 etc.
+Cross-sectional data:
+•	Each row = one observation
+•	House prices in 2024
+•	One snapshot in time
+Panel data:
+•	Each row = unit × time period
+•	Station × hour combinations
+•	Repeated observations
 
-Scatter Plot: Spatial Lag of Errors
-Create the spatial lag:
-library(spdep)
+## Cross-sectional: One row per station
+Station_A, May_2018, 4,250_total_trips
+Station_B, May_2018, 2,100_total_trips
 
-# Define neighbors (5 nearest)
-coords <- st_coordinates(boston_test)
-neighbors <- knn2nb(knearneigh(coords, k=5))
-weights <- nb2listw(neighbors, style="W")
+## Panel: One row per station-hour
+Station_A, May_1_08:00, 12_trips
+Station_A, May_1_09:00, 15_trips
+Station_A, May_1_10:00,  8_trips
+Station_B, May_1_08:00,  5_trips
+Station_B, May_1_09:00,  7_trips
 
-# Calculate spatial lag of errors
-boston_test$error_lag <- lag.listw(weights, boston_test$error)
+## Time binning
+Hourly binning:
+## All trips between 8:00-8:59 AM → "08:00" bin
+dat <- dat %>%
+  mutate(interval60 = floor_date(ymd_hms(start_time), unit = "hour"))
+Result:
+•	Trip at 8:05 AM → 08:00 bin
+•	Trip at 8:23 AM → 08:00 bin
+•	Trip at 9:07 AM → 09:00 bin
 
+## Extracting Time Features
+dat <- dat %>%
+  mutate(
+    interval60 = floor_date(ymd_hms(start_time), unit = "hour"),
+    week = week(interval60),           # Week of year (1-52)
+    dotw = wday(interval60, label=TRUE), # Day of week (Mon, Tue, ...)
+    hour = hour(interval60)            # Hour of day (0-23)
+  )
 
-For point data (houses), use k-nearest neighbors
-This also creates weights
-# Create 5-nearest neighbors
-coords <- st_coordinates(boston_test)
-nb <- knn2nb(knearneigh(coords, k=5))
-weights <- nb2listw(nb, style="W")
+These become predictors:
+•	Rush hour indicator: hour %in% c(7,8,9, 17,18,19)
+•	Weekend indicator: dotw %in% c("Sat", "Sun")
+•	Holiday effects: Memorial Day weekend
 
-then calculate spatial lag:
-boston$price_lag <- lag.listw(weights, boston$SalePrice)
+## Temporal Lags
+Temporal features (This week):
+•	Demand 1 hour ago
+•	Demand 2 hours ago
+•	Demand yesterday (24 hours ago)
 
-Computing Moran’s I
-Calculate Moran’s I for your errors:
-# Test for spatial autocorrelation in errors
-moran_test <- moran.mc(
-  boston_test$error,        # Your errors
-  weights,                  # Spatial weights matrix
-  nsim = 999                # Number of permutations
+## Creating Lag Variables
+study.panel <- study.panel %>%
+  arrange(from_station_id, interval60) %>%  # Sort by station, then time
+  group_by(from_station_id) %>%
+  mutate(
+    lag1Hour = lag(Trip_Count, 1),    # Previous hour
+    lag2Hours = lag(Trip_Count, 2),   # 2 hours ago
+    lag3Hours = lag(Trip_Count, 3),   # 3 hours ago
+    lag12Hours = lag(Trip_Count, 12), # 12 hours ago
+    lag1day = lag(Trip_Count, 24)     # Yesterday same time
+  ) %>%
+  ungroup(
+
+expand.grid() 
+
+## Create every possible station-hour combination
+study.panel <- expand.grid(
+  interval60 = unique(dat_census$interval60),
+  from_station_id = unique(dat_census$from_station_id)
 )
 
-# View results
-moran_test$statistic         # Moran's I value
+## Join to actual trip counts
+study.panel <- study.panel %>%
+  left_join(
+    dat_census %>% 
+      group_by(interval60, from_station_id) %>%
+      summarize(Trip_Count = n()),
+    by = c("interval60", "from_station_id")
+  ) %>%
+  mutate(Trip_Count = replace_na(Trip_Count, 0))  # Fill missing with 0
+Now every station-hour exists, even if Trip_Count = 0
 
-statistic 
-0.7186593 
-moran_test$p.value          # Is it significant?
+## Joining Station Attributes
+Each station has fixed characteristics:
+## Station location, demographics from census
+station_data <- dat_census %>%
+  group_by(from_station_id) %>%
+  summarize(
+    from_latitude = first(from_latitude),
+    from_longitude = first(from_longitude),
+    Med_Inc = first(Med_Inc),
+    Percent_White = first(Percent_White),
+    # ... other demographics
+  )
 
-[1] 0.001
-Interpretation:
-I > 0 and p < 0.05 → Significant clustering
-I ≈ 0 → Random pattern (good)
-I < 0 → Dispersion (rare with errors)
+## Join to panel
+study.panel <- study.panel %>%
+  left_join(station_data, by = "from_station_id")
 
+## Adding Time-Varying Features
+Some features change over time:
+## Weather changes hourly
+weather <- weather_data %>%
+  select(interval60, Temperature, Precipitation)
+
+study.panel <- study.panel %>%
+  left_join(weather, by = "interval60")
+
+## Create time features
+study.panel <- study.panel %>%
+  mutate(
+    week = week(interval60),
+    dotw = wday(interval60, label = TRUE),
+    hour = hour(interval60),
+    weekend = ifelse(dotw %in% c("Sat", "Sun"), 1, 0)
+  )
+
+
+## Temporal Validation
+CORRECT approach:
+## Train on Weeks 1-2
+train <- data %>% 
+  filter(week < 19)
+
+## Test on Weeks 3-4
+test <- data %>% 
+  filter(week >= 19)
+This is predicting the future using the past!
+
+## Temporal Train/Test Split
+## Split by time (week of year)
+train <- study.panel %>%
+  filter(week < 19)  # Weeks 1-2 of May (early period)
+
+test <- study.panel %>%
+  filter(week >= 19) # Weeks 3-4 of May (later period)
+
+## Fit models on training data only
+model <- lm(Trip_Count ~ lag1Hour + lag1day + Temperature + weekend, 
+            data = train)
+
+## Evaluate on test data
+predictions <- predict(model, newdata = test)
 
 
 ## Questions & Challenges
 
-- Im wondering if spatial autocorrelation is a negative trend? It seems like when spatial autocorrelation is present it would provide useful information?
+Which temporal lags actually matter?
+
+Including multiple lags (1 hour, 2 hours, 12 hours, 24 hours) raises questions about redundancy and multicollinearity. Many lagged variables are highly correlated with each other, can this inflate standard errors and make coefficients unstable?
+
+How do we separate time effects from station effects?
 
 ## Connections to Policy
 
-
-Spatial Autocorrelation can occur when a variable is similar or dissimilar across space in relation to grouped neighbors. As data analysts we have to try to identify this phenomenon and adjust to combat it or figure out why its happening and what the significance of it could be.
-
-
-The formula is really just asking:
-“When I’m above/below average, are my neighbors also above/below average?”
-Breaking it down:
-(𝑥𝑖−𝑥¯) = How far is my house’s error from the mean?
-(𝑥𝑗−𝑥¯) = How far is my neighbor’s error from the mean?
-Multiply them:
-If both positive or both negative → positive product (similar)
-If opposite signs → negative product (dissimilar)
-Sum across all neighbor pairs and normalize
-Result:
-Lots of positive products → High Moran’s I (clustering)
-Products near zero → Low Moran’s I (random)
-Negative products → Negative Moran’s I (rare with errors)
-
-
+Panel data models directly support operational policy decisions because they align with how public systems actually function over time. For bike share systems, demand is not static—it evolves hourly, daily, and seasonally. Policies about bike rebalancing, staffing, and infrastructure placement must therefore anticipate future demand rather than explain past usage. Lagged demand variables translate into predictive policy tools. If demand one hour ago strongly predicts current demand, operators can proactively reposition bikes before shortages occur. Weather variables and weekend indicators further enable policy adjustments that reflect real-time conditions, such as deploying additional resources during warm weekend afternoons or reducing supply during inclement weather. Integrating station-level demographics introduces an equity dimension. Policies guided by panel models must consider whether prediction errors systematically differ across neighborhoods or income levels, as misallocation of bikes could encourage access disparities rather than reduce them.
 
 ## Reflection
 
-A main takeaway was that clustering and spatial autocorrelation could just be information that the model hasn’t captured yet, potentially a missing geographical variable, neighborhood effects, school districts, access to amenities etc. . Spatial statistics is less about eliminating patterns and more about understanding why those patterns exist.
+Unlike cross-sectional analyses, panel models require careful attention to time ordering,and dependency structure. Creating temporal lags clarified how much behavior is driven by past patterns. The fact that recent demand is often the strongest predictor of current demand highlights the importance of short-term prediction in transportation systems. 
+

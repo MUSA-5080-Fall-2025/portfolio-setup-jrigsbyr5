@@ -1,90 +1,166 @@
 ---
-title: "Week 7 Notes"
-date: "2025-10-20"
+title: "Week 10 Notes"
+date: "2025-11-10"
 ---
 
 ## Key Concepts Learned
 
--   Spatial Autocorrelation
--   Morans I
+- Logistics Regression
 
 ## Coding Techniques
 
-Visualizing Error Patterns
+Let’s build a simple spam detector to understand the mechanics.
+Goal: Predict whether email is spam (1) or legitimate (0)
+Predictors: - Number of exclamation marks - Contains word “free” - Email length
 
-Scatter Plot: Spatial Lag of Errors
-Create the spatial lag:
-library(spdep)
+## Create example spam detection data
+set.seed(123)
+n_emails <- 1000
 
-# Define neighbors (5 nearest)
-coords <- st_coordinates(boston_test)
-neighbors <- knn2nb(knearneigh(coords, k=5))
-weights <- nb2listw(neighbors, style="W")
-
-# Calculate spatial lag of errors
-boston_test$error_lag <- lag.listw(weights, boston_test$error)
-
-
-For point data (houses), use k-nearest neighbors
-This also creates weights
-# Create 5-nearest neighbors
-coords <- st_coordinates(boston_test)
-nb <- knn2nb(knearneigh(coords, k=5))
-weights <- nb2listw(nb, style="W")
-
-then calculate spatial lag:
-boston$price_lag <- lag.listw(weights, boston$SalePrice)
-
-Computing Moran’s I
-Calculate Moran’s I for your errors:
-# Test for spatial autocorrelation in errors
-moran_test <- moran.mc(
-  boston_test$error,        # Your errors
-  weights,                  # Spatial weights matrix
-  nsim = 999                # Number of permutations
+spam_data <- data.frame(
+  exclamation_marks = c(rpois(100, 5), rpois(900, 0.5)),  # Spam has more !
+  contains_free = c(rbinom(100, 1, 0.8), rbinom(900, 1, 0.1)),  # Spam mentions "free"
+  length = c(rnorm(100, 200, 50), rnorm(900, 500, 100)),  # Spam is shorter
+  is_spam = c(rep(1, 100), rep(0, 900))
 )
 
-# View results
-moran_test$statistic         # Moran's I value
+## Look at the data
+head(spam_data)
 
-statistic 
-0.7186593 
-moran_test$p.value          # Is it significant?
+## Fitting the Logistic Model
+In R, we use glm() with family = "binomial"
 
-[1] 0.001
-Interpretation:
-I > 0 and p < 0.05 → Significant clustering
-I ≈ 0 → Random pattern (good)
-I < 0 → Dispersion (rare with errors)
+## Fit logistic regression
+spam_model <- glm(
+  is_spam ~ exclamation_marks + contains_free + length,
+  data = spam_data,
+  family = "binomial"  # This specifies logistic regression
+)
+
+## View results
+summary(spam_model)
+
+## Interpreting Coefficients
+
+## Extract coefficients
+coefs <- coef(spam_model)
+print(coefs)
+      (Intercept) exclamation_marks     contains_free            length 
+       233.048051         55.944824         46.055006         -1.272668 
+## Convert to odds ratios
+odds_ratios <- exp(coefs)
+print(odds_ratios)
+      (Intercept) exclamation_marks     contains_free            length 
+    1.627356e+101      1.979376e+24      1.003310e+20      2.800833e-01 
 
 
+## Making Predictions
+The model outputs probabilities:
+## Predict probability for a new email
+new_email <- data.frame(
+  exclamation_marks = 3,
+  contains_free = 1,
+  length = 150
+)
+
+predicted_prob <- predict(spam_model, newdata = new_email, type = "response")
+cat("Predicted probability of spam:", round(predicted_prob, 3))
+Predicted probability of spam: 1
+
+Calculate metrics at different thresholds
+thresholds <- seq(0.1, 0.9, by = 0.1)
+
+metrics_by_threshold <- map_df(thresholds, function(thresh) {
+  preds <- ifelse(spam_data$predicted_prob > thresh, 1, 0)
+  cm <- confusionMatrix(as.factor(preds), as.factor(spam_data$actual_spam), 
+                        positive = "1")
+  
+  data.frame(
+    threshold = thresh,
+    sensitivity = cm$byClass["Sensitivity"],
+    specificity = cm$byClass["Specificity"],
+    precision = cm$byClass["Precision"]
+  )
+})
+
+## Visualize the trade-off
+ggplot(metrics_by_threshold, aes(x = threshold)) +
+  geom_line(aes(y = sensitivity, color = "Sensitivity"), size = 1.2) +
+  geom_line(aes(y = specificity, color = "Specificity"), size = 1.2) +
+  geom_line(aes(y = precision, color = "Precision"), size = 1.2) +
+  labs(title = "The Threshold Trade-off",
+       subtitle = "As threshold increases, we become more selective",
+       x = "Probability Threshold", y = "Metric Value") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 
 ## Questions & Challenges
 
-- Im wondering if spatial autocorrelation is a negative trend? It seems like when spatial autocorrelation is present it would provide useful information?
+How should predictors with different scales be interpreted together?
+The model combines count variables (exclamation marks), binary indicators (contains_free), and continuous measures (email length).
+
+How do we assess model performance beyond accuracy?
+With imbalanced cases (only 10% spam), accuracy would be misleading, as predicting “not spam” for all emails would still appear highly accurate.
 
 ## Connections to Policy
 
+## Logistic Regression
+The solution: Transform the problem
+Instead of predicting Y directly, predict the probability that Y = 1
+The logistic function constrains predictions between 0 and 1:
 
-Spatial Autocorrelation can occur when a variable is similar or dissimilar across space in relation to grouped neighbors. As data analysts we have to try to identify this phenomenon and adjust to combat it or figure out why its happening and what the significance of it could be.
+Behind the scenes: We work with log-odds, not probabilities directly
+Odds: Odds=𝑝1−𝑝
+Log-Odds (Logit): logit(𝑝)=ln(𝑝1−𝑝)
+This creates a linear relationship:
+ln(𝑝1−𝑝)=𝛽0+𝛽1𝑋1+𝛽2𝑋2+...
+
+## Why this matters:
+Coefficients are log-odds (like linear regression)
+But we interpret as odds ratios when exponentiated: 𝑒𝛽
+OR > 1: predictor increases odds of outcome
+OR < 1: predictor decreases odds of outcome
 
 
-The formula is really just asking:
-“When I’m above/below average, are my neighbors also above/below average?”
-Breaking it down:
-(𝑥𝑖−𝑥¯) = How far is my house’s error from the mean?
-(𝑥𝑗−𝑥¯) = How far is my neighbor’s error from the mean?
-Multiply them:
-If both positive or both negative → positive product (similar)
-If opposite signs → negative product (dissimilar)
-Sum across all neighbor pairs and normalize
-Result:
-Lots of positive products → High Moran’s I (clustering)
-Products near zero → Low Moran’s I (random)
-Negative products → Negative Moran’s I (rare with errors)
+## Interpretation:
+•	exclamation_marks: Each additional ! multiplies odds of spam by 1.9793761^{24}
+•	contains_free: Having “free” multiplies odds by 1.0033099^{20}
+•	length: Each additional character multiplies odds by 0.2801 (shorter = more likely spam)
 
+## Next?
+•	If probability = 0.723, is this spam or not?
+•	We need to choose a threshold (cutoff)
+•	Threshold = 0.5 is common default, but is it the right choice?
+
+## Question: What probability threshold should we use to classify?
+•	Threshold = 0.5? (common default)
+•	Threshold = 0.3? (more aggressive - flag more as spam)
+•	Threshold = 0.7? (more conservative - only flag obvious spam)
+The answer depends on:
+•	Cost of false positives (marking legitimate email as spam)
+•	Cost of false negatives (missing actual spam)
+•	These costs are rarely equal
+
+## Calculating Performance Metrics
+From the confusion matrix, we derive metrics that emphasize different trade-offs:
+Sensitivity (Recall, True Positive Rate):
+Sensitivity=𝑇𝑃𝑇𝑃+𝐹𝑁
+“Of all actual positives, how many did we catch?”
+Specificity (True Negative Rate):
+Specificity=𝑇𝑁𝑇𝑁+𝐹𝑃
+“Of all actual negatives, how many did we correctly identify?”
+Precision (Positive Predictive Value):
+Precision=𝑇𝑃𝑇𝑃+𝐹𝑃
+“Of all our positive predictions, how many were correct?”
+
+Calculate metrics at different thresholds
+thresholds <- seq(0.1, 0.9, by = 0.1)
+
+Selecting the threshold has a huge impact for policy adaptation. The threshold will determine what events are possibly missed and what events are possibly captured.
 
 
 ## Reflection
 
-A main takeaway was that clustering and spatial autocorrelation could just be information that the model hasn’t captured yet, potentially a missing geographical variable, neighborhood effects, school districts, access to amenities etc. . Spatial statistics is less about eliminating patterns and more about understanding why those patterns exist.
+This lecture clarified that logistic regression is not primarily a classification tool, but a probability-estimation framework. The key insight is that the model’s core output is uncertainty, not a yes-or-no decision. Classification only occurs after a threshold is chosen, and that choice reflects values, costs, and priorities rather than purely statistical optimization. The threshold analysis emphasized the policy relevance of statistical modeling. Small changes in threshold dramatically shift sensitivity, specificity, and precision, altering who is affected by errors. In practice, this means that model deployment decisions have judgments about risk, fairness, and trade-offs. Logistic regression does not remove subjectivity from decision-making; instead, it makes those choices measurable.
+
+

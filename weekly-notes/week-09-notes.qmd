@@ -13,41 +13,41 @@ date: "2025-11-03"
 Local Moran’s I in R: Step by Step
 library(spdep)
 
-# Step 1: Create spatial object
+## Step 1: Create spatial object
 fishnet_sp <- as_Spatial(fishnet)
 
-# Step 2: Define neighbors (Queen contiguity)
+## Step 2: Define neighbors (Queen contiguity)
 neighbors <- poly2nb(fishnet_sp, queen = TRUE)
 
-# Step 3: Create spatial weights (row-standardized)
+## Step 3: Create spatial weights (row-standardized)
 weights <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
 
-# Step 4: Calculate Local Moran's I
+## Step 4: Calculate Local Moran's I
 local_moran <- localmoran(
   fishnet$abandoned_cars,  # Variable of interest
   weights,                  # Spatial weights
   zero.policy = TRUE       # Handle cells with no neighbors
 )
 
-# Step 5: Extract components
+## Step 5: Extract components
 fishnet$local_I <- local_moran[, "Ii"]      # Local I statistic
 fishnet$p_value <- local_moran[, "Pr(z != E(Ii))"]  # P-value
 fishnet$z_score <- local_moran[, "Z.Ii"]    # Z-score
 
 
 
-# Identifying High-High Clusters (Hotspots)
+## Identifying High-High Clusters (Hotspots)
 # Standardize the variable for quadrant classification
 fishnet$standardized_value <- scale(fishnet$abandoned_cars)
 
-# Calculate spatial lag (weighted mean of neighbors)
+## Calculate spatial lag (weighted mean of neighbors)
 fishnet$spatial_lag <- lag.listw(weights, fishnet$abandoned_cars)
 fishnet$standardized_lag <- scale(fishnet$spatial_lag)
 
-# Identify High-High clusters
+## Identify High-High clusters
 fishnet$hotspot <- 0  # Default: not a hotspot
 
-# Criteria: 
+## Criteria: 
  1. Value above mean (standardized > 0)
  2. Neighbors above mean (spatial lag > 0)
  3. Statistically significant (p < 0.05)
@@ -58,11 +58,11 @@ fishnet$hotspot[
   fishnet$p_value < 0.05
 ] <- 1
 
-# Count hotspots
+## Count hotspots
 sum(fishnet$hotspot)
 
-# Distribution of Crime Counts
-# Typical pattern for crime data
+## Distribution of Crime Counts
+## Typical pattern for crime data
 ggplot(fishnet, aes(x = countBurglaries)) +
   geom_histogram(binwidth = 1, fill = "#440154FF", color = "white") +
   labs(
@@ -73,7 +73,7 @@ ggplot(fishnet, aes(x = countBurglaries)) +
   ) +
   theme_minimal()
 
-# Interpreting Poisson Coefficients
+## Interpreting Poisson Coefficients
 On log scale:
 𝛽1 = change in log(expected count) per unit increase in 𝑋1
 On count scale (exponentiate):
@@ -85,30 +85,30 @@ Examples:
 0.00	1.00	No effect
 0.69	2.00	Doubling per unit of X
 
-# Poisson Regression in R
-# Fit Poisson model
+## Poisson Regression in R
+## Fit Poisson model
 model_poisson <- glm(
   countBurglaries ~ Abandoned_Cars + Abandoned_Cars.nn + abandoned.isSig.dist,
   data = fishnet,
   family = poisson(link = "log")
 )
 
-# View results
+## View results
 summary(model_poisson)
 
-# Exponentiate coefficients for interpretation
+## Exponentiate coefficients for interpretation
 exp(coef(model_poisson))
 
-# Example output:
-#                        exp(coef)
-# (Intercept)            0.234
-# Abandoned_Cars         1.151
-# Abandoned_Cars.nn      0.998
-# abandoned.isSig.dist   0.999
+## Example output:
+                        exp(coef)
+(Intercept)            0.234
+Abandoned_Cars         1.151
+Abandoned_Cars.nn      0.998
+abandoned.isSig.dist   0.999
 
-# Interpretation:
-# - Each additional abandoned car → 15.1% increase in expected burglaries
-# - Each meter from nearest abandoned car → 0.2% decrease in expected burglaries
+## Interpretation:
+- Each additional abandoned car → 15.1% increase in expected burglaries
+- Each meter from nearest abandoned car → 0.2% decrease in expected burglaries
 
 •  If ≈ 1: Poisson is fine
 •  If > 1: Overdispersion (common!)
@@ -118,26 +118,26 @@ exp(coef(model_poisson))
 
 
 
-# Checking Overdispersion in R
-# Fit Poisson model
+## Checking Overdispersion in R
+## Fit Poisson model
 model_pois <- glm(
   countBurglaries ~ Abandoned_Cars + Abandoned_Cars.nn + abandoned.isSig.dist,
   data = fishnet,
   family = poisson
 )
 
-# Calculate dispersion parameter
+## Calculate dispersion parameter
 dispersion <- sum(residuals(model_pois, type = "pearson")^2) / 
                model_pois$df.residual
 
 cat("Dispersion parameter:", round(dispersion, 3), "\n")
 
-# Rule of thumb:
+## Rule of thumb:
 < 1.5: Poisson OK
 1.5 - 3: Mild overdispersion, NegBin recommended
 > 3: Serious overdispersion, NegBin essential
 
-# Example output:
+## Example output:
 Dispersion parameter: 4.523
 Warning: Serious overdispersion detected
 
@@ -150,45 +150,45 @@ Var(𝑌𝑖)=𝜇𝑖+𝛼𝜇2𝑖
 Negative Binomial in R
 library(MASS)
 
-# Fit Negative Binomial model
+## Fit Negative Binomial model
 model_nb <- glm.nb(
   countBurglaries ~ Abandoned_Cars + Abandoned_Cars.nn + abandoned.isSig.dist,
   data = fishnet
 )
 
-# View results
+## View results
 summary(model_nb)
 
-# Compare to Poisson
+## Compare to Poisson
 AIC(model_pois)  # e.g., 8234.5
 AIC(model_nb)    # e.g., 6721.3
 
-# Lower AIC = better fit
+## Lower AIC = better fit
  If NegBin AIC much lower → use NegBin
 
-# Extract dispersion parameter (theta)
+## Extract dispersion parameter (theta)
 model_nb$theta  # e.g., 2.47
 
 Interpretation: Significant overdispersion confirmed
 
 
-# Deviance residuals
+## Deviance residuals
 plot(model_nb, which = 1)  # Residuals vs. Fitted
 
-# Identify outliers
+## Identify outliers
 outliers <- which(abs(residuals(model_nb, type = "deviance")) > 3)
 
-# Influence
+## Influence
 influence <- cooks.distance(model_nb)
 influential <- which(influence > 4/length(influence))
 
 Creating a Fishnet Grid
 library(sf)
 
-# Step 1: Define cell size (in map units - meters for our projection)
+## Step 1: Define cell size (in map units - meters for our projection)
 cell_size <- 500  # 500m x 500m cells
 
-# Step 2: Create grid over study area
+## Step 2: Create grid over study area
 fishnet <- st_make_grid(
   chicago_boundary,
   cellsize = cell_size,
@@ -198,10 +198,10 @@ fishnet <- st_make_grid(
   st_sf() %>%
   mutate(uniqueID = row_number())
 
-# Step 3: Clip to study area (remove cells outside boundary)
+## Step 3: Clip to study area (remove cells outside boundary)
 fishnet <- fishnet[chicago_boundary, ]
 
-# Check results
+## Check results
 nrow(fishnet)  # Number of cells
 st_area(fishnet[1, ])  # Area of one cell (should be 250,000 m²)
 
@@ -216,14 +216,14 @@ Predict for District 1
 Repeat for each district
 
 
-# LOGO-CV Implementation
-# Get unique districts
+## LOGO-CV Implementation
+## Get unique districts
 districts <- unique(fishnet$District)
 
-# Initialize results
+## Initialize results
 cv_results <- list()
 
-# Loop through districts
+## Loop through districts
 for (dist in districts) {
   # Split data
   train_data <- fishnet %>% filter(District != dist)
@@ -242,33 +242,33 @@ for (dist in districts) {
   cv_results[[dist]] <- test_data
 }
 
-# Combine all predictions
+## Combine all predictions
 all_predictions <- bind_rows(cv_results
 
 
 Calculating KDE in R
 library(spatstat)
 
-# Step 1: Convert to point pattern (ppp) object
+## Step 1: Convert to point pattern (ppp) object
 burglary_ppp <- as.ppp(
   X = st_coordinates(burglaries),
   W = as.owin(st_bbox(chicago_boundary))
 )
 
-# Step 2: Calculate KDE
+## Step 2: Calculate KDE
 kde_surface <- density.ppp(
   burglary_ppp,
   sigma = 1000,  # Bandwidth in meters
   edge = TRUE    # Edge correction
 )
 
-# Step 3: Extract values to fishnet cells
+## Step 3: Extract values to fishnet cells
 fishnet$kde_risk <- raster::extract(
   raster(kde_surface),
   st_centroid(fishnet)
 )
 
-# Standardize to 0-1 scale for comparison
+## Standardize to 0-1 scale for comparison
 fishnet$kde_risk <- (fishnet$kde_risk - min(fishnet$kde_risk, na.rm=T)) / 
                      (max(fishnet$kde_risk, na.rm=T) - min(fishnet$kde_risk, na.rm=T))
 

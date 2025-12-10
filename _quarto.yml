@@ -24,8 +24,14 @@ website:
             text: Week 6 Notes
           - href: weekly-notes/week-07-notes.qmd
             text: Week 7 Notes
-          - href: weekly-notes/week-08-notes.qmd
-            text: Week 8 Notes
+          - href: weekly-notes/week-09-notes.qmd
+            text: Week 9 Notes
+          - href: weekly-notes/week-10-notes.qmd
+            text: Week 10 Notes
+          - href: weekly-notes/week-11-notes.qmd
+            text: Week 11 Notes
+          - href: weekly-notes/week-12-notes.qmd
+            text: Week 12 Notes
             
       - text: Labs
         menu:
@@ -43,8 +49,7 @@ website:
             text: Midterm Technical Appendix
           - href: labs/lab4/Actual Assignment 4 copy.qmd
             text: Assignmnet 4
-          - href: labs/lab5/Indego_SpaceTime_Prediction_Q2.Rmd
-            text: Assignmnet 5
+          
 format:
   html:
     theme: cosmo
